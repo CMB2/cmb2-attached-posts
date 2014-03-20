@@ -1,0 +1,68 @@
+table.cmb_metabox #posts-wrap {
+	background: url(../images/attached-arrow.png) 50% 50% no-repeat;
+	display: inline-block;
+	width: 100%;
+}
+
+table.cmb_metabox .connected {
+	border: 1px solid #ddd;
+	cursor: pointer;
+	float: left;
+	height: 300px;
+	overflow-y: scroll;
+	padding: 0;
+	width: 45%;
+}
+
+#attached {
+	float: right;
+}
+
+table.cmb_metabox .connected li {
+	border-bottom: 1px solid #f1f1f1;
+	margin: 0;
+	padding: 10px 40px 10px 10px;
+	position: relative;
+}
+
+table.cmb_metabox .connected li:hover {
+	background: #e6e6e6;
+}
+
+#retrieved li.added {
+	opacity: .5;
+}
+
+#retrieved li.added:hover {
+	background: #fff;
+	cursor: initial;
+}
+
+#retrieved li.added:hover .add-remove {
+	background-position: 0 -22px;
+}
+
+.connected li .sprite {
+	background: url(../images/attached-sprite.png);
+}
+
+.connected li .add-remove {
+	display: block;
+	height: 22px;
+	position: absolute;
+	right: 10px;
+	top: 5px;
+	width: 22px;
+}
+
+#retrieved li .add-remove {
+	background-position: 0 -22px;
+}
+
+#retrieved li:hover .add-remove {
+	background-position: -22px -22px;
+}
+
+#attached li:hover .add-remove {
+	background-position: -22px 0;
+}
