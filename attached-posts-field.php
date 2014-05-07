@@ -51,7 +51,6 @@ function cmb_render_custom_attached_posts_callback( $field, $meta ) {
 		// Set a class if our post is in our attached post meta
 		$added = in_array( $post->ID, $attached ) ? ' added' : '';
 
-
 		// Build our list item
 		echo '<li id="', $post->ID ,'" class="' . $zebra . $added . '">', $post->post_title ,'<span class="sprite add-remove"></span></li>';
 
@@ -116,5 +115,60 @@ function custom_check_for_attached_posts( $field ) {
 	}
 
 	return $output;
+
+}
+
+
+/**
+ * Example function on grabbing results from the post meta
+ */
+function get_custom_attached_posts() {
+
+	// Check to see if we have attached posts
+	$attached = get_post_meta( get_the_ID(), '_attached_posts', true );
+
+	// Loop through our posts
+	foreach ( $attached as $post ) {
+
+		// Set a class depending on whether or not we have a thumbnail
+		$thumb_class = has_post_thumbnail( $post ) ? 'thumb' : 'no-thumb';
+		$post_class = get_post_class( $thumb_class, $post );
+		$post_class	= implode( ' ', $post_class );
+
+		// Set our title args
+		$title_before	= '<h2 class="title">';
+		$title_after	= '</h2>';
+		$title_before	= $title_before . '<a href="' . esc_url( get_permalink( $post ) ) . '" rel="bookmark" title="' . get_the_title( $post ) . '">';
+		$title_after	= '</a>' . $title_after;
+
+	?>
+
+		<div <?php post_class( $post_class ); ?> id="post-<?php echo $post; ?>">
+
+	<?php
+
+		// Get the post thumbnail
+		echo get_the_post_thumbnail( $post, 'thumbnail' );
+
+		// Begin our single post wrap
+		echo '<div class="single-post-wrap">';
+		echo '<div class="inner">';
+		echo '<header>';
+		echo $title_before . get_the_title( $post ) . $title_after;
+		echo '<div class="post-cat">';
+		the_category();
+		echo '</div>';
+		echo '</header>';
+		echo '<section class="entry">';
+
+		// Get our excerpt
+		the_excerpt();
+
+		// Close some stuff
+		echo '</section><!-- .entry -->';
+		echo '</div><!-- .inner -->';
+		echo '</div><!-- .single-post-wrap -->';
+
+	}
 
 }
