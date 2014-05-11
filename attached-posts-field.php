@@ -49,7 +49,7 @@ function cmb_render_custom_attached_posts_callback( $field, $meta ) {
 		$zebra = $count % 2 == 0 ? 'even' : 'odd';
 
 		// Set a class if our post is in our attached post meta
-		$added = in_array( $post->ID, $attached ) ? ' added' : '';
+		$added = ! empty ( $attached ) && in_array( $post->ID, $attached ) ? ' added' : '';
 
 		// Build our list item
 		echo '<li id="', $post->ID ,'" class="' . $zebra . $added . '">', $post->post_title ,'<span class="sprite add-remove"></span></li>';
