@@ -7,28 +7,26 @@
 
 	app.cache = function() {
 		app.$ = {};
-		app.$.retrievedPosts     = '#retrieved';
-		app.$.retrievedPostsItem = app.$.retrievedPosts+' li';
-		app.$.addPost            = app.$.retrievedPosts+' .add-remove';
-		app.$.attachedPosts      = '#attached';
-		app.$.attachedPostsItem  = app.$.attachedPosts+' li';
-		app.$.removePost         = app.$.attachedPosts+' .add-remove';
+		app.$.retrievedPosts     = $( document.getElementById( 'retrieved' ) );
+		app.$.retrievedPostsItem = app.$.retrievedPosts.find( 'li' );
+		app.$.attachedPosts      = $( document.getElementById( 'attached' ) );
+		app.$.attachedPostsItem  = app.$.attachedPosts.find( 'li' );
 	};
 
 	app.init = function() {
 		app.cache();
 
 		// Allow the user to drag items from the left list
-		$(app.$.retrievedPostsItem).draggable({
+		app.$.retrievedPostsItem.draggable({
 			helper: 'clone',
 			revert: 'invalid',
-			stack: app.$.retrievedPostsItem,
+			stack: '#retrieved li',
 			stop: app.replacePlusIcon,
 		});
 
 		// Allow the right list to be droppable and sortable
-		$(app.$.attachedPosts).droppable({
-			accept: app.$.retrievedPostsItem,
+		app.$.attachedPosts.droppable({
+			accept: '#retrieved li',
 			drop: function(event, ui) {
 				app.buildItems( ui.draggable );
 			},
@@ -38,10 +36,10 @@
 		}).sortable().disableSelection();
 
 		// Add posts when the plus icon is clicked
-		$('body').on('click', app.$.addPost, app.addPostToColumn);
+		app.$.retrievedPosts.on('click', '.add-remove', app.addPostToColumn);
 
 		// Remove posts when the minus icon is clicked
-		$('body').on('click', app.$.removePost, app.removePostFromColumn);
+		app.$.attachedPosts.on('click', '.add-remove', app.removePostFromColumn);
 	}
 
 	// Clone our dragged item
@@ -53,7 +51,7 @@
 			itemArray = [];
 
 		// Don't add the item if an item with this ID exists already
-		$(app.$.attachedPostsItem).each(function() {
+		app.$.attachedPostsItem.each(function() {
 
 			// Get our list item ID
 			var listItemID = $(this).attr('id');
@@ -78,11 +76,11 @@
 		var itemID = item['context'].id;
 
 		// Add the 'added' class to our retrieved column when clicked
-		$(app.$.retrievedPosts+' #' + itemID).addClass('added');
+		app.$.attachedPosts.find( '#' + itemID ).addClass('added');
 
 		// Add our hidden input
 		setTimeout(function(){
-			$('<input type="hidden" name="_attached_cmb2_attached_posts[]" value="' + itemID + '">').appendTo(app.$.attachedPosts+' #' + itemID );
+			$('<input type="hidden" name="_attached_cmb2_attached_posts[]" value="' + itemID + '">').appendTo( app.$.attachedPosts.find( '#' + itemID ) );
 		},1000);
 	}
 
@@ -101,7 +99,7 @@
 			itemArray = [];
 
 		// Don't add the item if an item with this ID exists already
-		$(app.$.attachedPostsItem).each(function() {
+		app.$.attachedPostsItem.each(function() {
 
 			// Get our list item ID
 			var listItemID = $(this).attr('id');
@@ -115,10 +113,10 @@
 			return;
 
 		// Add the item to the right list
-		$(this).parent().clone().appendTo($(app.$.attachedPosts).not($(this).closest('ul')));
+		$(this).parent().clone().appendTo( app.$.attachedPosts.not( $(this).closest('ul') ) );
 
 		// Add our hidden input field
-		$('<input type="hidden" name="_attached_cmb2_attached_posts[]" value="' + itemID + '">').appendTo(app.$.attachedPosts+' #' + itemID );
+		$('<input type="hidden" name="_attached_cmb2_attached_posts[]" value="' + itemID + '">').appendTo( app.$.attachedPosts.find( '#' + itemID ) );
 
 		// Replace the plus icon with a minus icon in the attached column
 		app.replacePlusIcon();
@@ -134,14 +132,14 @@
 		$(this).parent().remove();
 
 		// Remove the 'added' class from the retrieved column
-		$(app.$.retrievedPosts+' #' + itemID).removeClass('added');
+		app.$.attachedPosts.find( '#' + itemID ).removeClass('added');
 	}
 
 	// Replace the plus icon in the attached posts column
 	app.replacePlusIcon = function(){
 
-		$(app.$.attachedPostsItem+' .dashicons').removeClass('dashicons-plus');
-		$(app.$.attachedPostsItem+' .dashicons').addClass('dashicons-minus');
+		$( '#attached li .dashicons' ).removeClass( 'dashicons-plus' );
+		$( '#attached li .dashicons' ).addClass( 'dashicons-minus' );
 
 	}
 
