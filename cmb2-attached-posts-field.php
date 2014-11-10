@@ -6,11 +6,16 @@ function attached_cmb2_enqueue_attached_posts_scripts() {
 
 	$version = '1.0.0';
 
-	$attached_posts_dir = content_url( 'mu-plugins/cmb2-attached-posts/' );
+	$dir = trailingslashit( dirname( __FILE__ ) );
+	$url = str_replace(
+		array( WP_CONTENT_DIR, WP_PLUGIN_DIR ),
+		array( WP_CONTENT_URL, WP_PLUGIN_URL ),
+		$dir
+	);
 
-	wp_enqueue_script( 'jquery-ui', $attached_posts_dir . 'js/lib/jquery-ui-1.10.4.custom.min.js', array( 'jquery' ), $version, true );
-	wp_enqueue_script( 'attached-cmb2-attached-posts', $attached_posts_dir . 'js/attached-posts.js', array( 'jquery-ui' ), $version, true );
-	wp_enqueue_style( 'attached-cmb2-attached-posts', $attached_posts_dir . 'css/attached-posts-admin.css', array(), $version );
+	wp_enqueue_script( 'jquery-ui', $url . 'js/lib/jquery-ui-1.10.4.custom.min.js', array( 'jquery' ), $version, true );
+	wp_enqueue_script( 'attached-cmb2-attached-posts', $url . 'js/attached-posts.js', array( 'jquery-ui' ), $version, true );
+	wp_enqueue_style( 'attached-cmb2-attached-posts', $url . 'css/attached-posts-admin.css', array(), $version );
 
 }
 add_action( 'admin_enqueue_scripts', 'attached_cmb2_enqueue_attached_posts_scripts' );
@@ -44,7 +49,7 @@ function cmb2_render_custom_attached_posts_callback( $field, $field_args, $value
 	$count = 0;
 
 	// Wrap our lists
-	echo '<div id="posts-wrap">';
+	echo '<div class="attached-posts-wrap">';
 
 	// Open our retrieved, or found posts, list
 	echo '<div class="retrieved-wrap column-wrap">';
@@ -64,7 +69,7 @@ function cmb2_render_custom_attached_posts_callback( $field, $field_args, $value
 		$added = ! empty ( $attached ) && in_array( $post->ID, $attached ) ? ' added' : '';
 
 		// Build our list item
-		echo '<li id="', $post->ID ,'" class="' . $zebra . $added . '">', $post->post_title ,'<span class="dashicons dashicons-plus add-remove"></span></li>';
+		echo '<li data-id="', $post->ID ,'" class="' . $zebra . $added . '">', $post->post_title ,'<span class="dashicons dashicons-plus add-remove"></span></li>';
 
 	}
 
@@ -83,7 +88,7 @@ function cmb2_render_custom_attached_posts_callback( $field, $field_args, $value
 	// Close up shop
 	echo '</ul><!-- #attached -->';
 	echo '</div><!-- .attached-wrap -->';
-	echo '</div><!-- #posts-wrap -->';
+	echo '</div><!-- .attached-posts-wrap -->';
 
 	// Display our description if one exists
 	echo '<p class="cmb_metabox_description">', $field->desc(), '</p>';
@@ -124,7 +129,7 @@ function custom_check_for_attached_posts( $field ) {
 			$zebra = $count % 2 == 0 ? 'even' : 'odd';
 
 			// Build our list item
-			$output .= '<li id="' . $post . '" class="' . $zebra . '">' . get_the_title( $post ) . '<input type="hidden" value="' . $post . '" name="' . $field->id() . '[]"><span class="dashicons dashicons-minus add-remove"></span></li>';
+			$output .= '<li data-id="' . $post . '" class="' . $zebra . '">' . get_the_title( $post ) . '<input type="hidden" value="' . $post . '" name="' . $field->id() . '[]"><span class="dashicons dashicons-minus add-remove"></span></li>';
 		}
 
 	}

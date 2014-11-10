@@ -54,10 +54,10 @@
 		app.$.attachedPostsItem.each(function() {
 
 			// Get our list item ID
-			var listItemID = $(this).attr('id');
+			var listItemID = $(this).data( 'id' );
 
 			// Add the ID to our array
-			itemArray.push(listItemID);
+			itemArray.push( listItemID );
 		});
 
 		// If our item is not in our post ID array, stop everything
@@ -95,14 +95,14 @@
 
 		// Get the clicked item's ID
 		// Start our array
-		var itemID    = $(this).parent().attr('id'),
+		var itemID    = $(this).parent().data( 'id' ),
 			itemArray = [];
 
 		// Don't add the item if an item with this ID exists already
 		app.$.attachedPostsItem.each(function() {
 
 			// Get our list item ID
-			var listItemID = $(this).attr('id');
+			var listItemID = $(this).data( 'id' );
 
 			// Add the ID to our array
 			itemArray.push(listItemID);
@@ -126,13 +126,13 @@
 	app.removePostFromColumn = function(){
 
 		// Get the clicked item's ID
-		var itemID = $(this).parent().attr('id');
+		var itemID = $(this).closest( 'li' ).data( 'id' );
 
 		// Remove the list item
 		$(this).parent().remove();
 
 		// Remove the 'added' class from the retrieved column
-		app.$.attachedPosts.find( '#' + itemID ).removeClass('added');
+		app.$.retrievedPosts.find( '[data-id="' + itemID +'"]' ).removeClass( 'added' );
 	};
 
 	// Replace the plus icon in the attached posts column

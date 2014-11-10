@@ -3,10 +3,10 @@
  * Example setup for the custom Attached Posts field for CMB2.
  */
 
-require_once 'cmb2/init.php';
+require_once WPMU_PLUGIN_DIR . '/cmb2/init.php';
 
 if ( ! function_exists( 'cmb2_render_custom_attached_posts_callback' ) ) {
-	require_once 'cmb2-post-search-field/cmb2_post_search_field.php';
+	require_once WPMU_PLUGIN_DIR . '/cmb2-attached-posts/cmb2-attached-posts-field.php';
 }
 
 /**
@@ -15,8 +15,8 @@ if ( ! function_exists( 'cmb2_render_custom_attached_posts_callback' ) ) {
  * @param  array $meta_boxes
  * @return array
  */
-add_filter( 'cmb2_meta_boxes', 'attached_cmb2_metaboxes' );
-function attached_cmb2_metaboxes( array $meta_boxes ) {
+add_filter( 'cmb2_meta_boxes', 'attached_cmb2_metaboxes_example' );
+function attached_cmb2_metaboxes_example( array $meta_boxes ) {
 
 	// Start with an underscore to hide fields from custom fields list
 	$prefix = '_attached_cmb2_';
@@ -39,8 +39,7 @@ function attached_cmb2_metaboxes( array $meta_boxes ) {
 		),
 	);
 
-/* End CMB for Pages */
+	/* End CMB for Pages */
 
 	return $meta_boxes;
-
 }
