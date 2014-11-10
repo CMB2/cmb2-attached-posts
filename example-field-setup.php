@@ -5,6 +5,10 @@
 
 require_once 'cmb2/init.php';
 
+if ( ! function_exists( 'cmb2_render_custom_attached_posts_callback' ) ) {
+	require_once 'cmb2-post-search-field/cmb2_post_search_field.php';
+}
+
 /**
  * Define the metabox and field configurations.
  *
