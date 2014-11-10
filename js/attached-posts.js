@@ -40,7 +40,7 @@
 
 		// Remove posts when the minus icon is clicked
 		app.$.attachedPosts.on('click', '.add-remove', app.removePostFromColumn);
-	}
+	};
 
 	// Clone our dragged item
 	app.buildItems = function(item) {
@@ -66,14 +66,14 @@
 
 		// If we can continue, do so
 		item.clone().appendTo(app.$.attachedPosts);
-	}
+	};
 
 	// Add a hidden field when our posts are added.
 	// This saves the ID as post meta
 	app.attachedAddHiddenField = function(item){
 
 		// Get our dragged item ID
-		var itemID = item['context'].id;
+		var itemID = item.context && item.context.id ? item.context.id : null;
 
 		// Add the 'added' class to our retrieved column when clicked
 		app.$.attachedPosts.find( '#' + itemID ).addClass('added');
@@ -82,7 +82,7 @@
 		setTimeout(function(){
 			$('<input type="hidden" name="_attached_cmb2_attached_posts[]" value="' + itemID + '">').appendTo( app.$.attachedPosts.find( '#' + itemID ) );
 		},1000);
-	}
+	};
 
 	// Add the items when the plus icon is clicked
 	app.addPostToColumn = function(){
@@ -120,7 +120,7 @@
 
 		// Replace the plus icon with a minus icon in the attached column
 		app.replacePlusIcon();
-	}
+	};
 
 	// Remove items from our attached list when the minus icon is clicked
 	app.removePostFromColumn = function(){
@@ -133,7 +133,7 @@
 
 		// Remove the 'added' class from the retrieved column
 		app.$.attachedPosts.find( '#' + itemID ).removeClass('added');
-	}
+	};
 
 	// Replace the plus icon in the attached posts column
 	app.replacePlusIcon = function(){
@@ -141,7 +141,7 @@
 		$( '#attached li .dashicons' ).removeClass( 'dashicons-plus' );
 		$( '#attached li .dashicons' ).addClass( 'dashicons-minus' );
 
-	}
+	};
 
 	jQuery(document).ready( app.init );
 
