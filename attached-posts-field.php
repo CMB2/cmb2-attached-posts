@@ -1,13 +1,29 @@
 <?php
 /**
+ * Enqueue admin scripts for our attached posts field
+ */
+function attached_cmb2_enqueue_attached_posts_scripts() {
+
+	$version = '1.0.0';
+
+	$attached_posts_dir = content_url( 'mu-plugins/cmb2-attached-posts/' );
+
+	wp_enqueue_script( 'jquery-ui', $attached_posts_dir . 'js/lib/jquery-ui-1.10.4.custom.min.js', array( 'jquery' ), $version, true );
+	wp_enqueue_script( 'attached-cmb2-attached-posts', $attached_posts_dir . 'js/attached-posts.js', array( 'jquery-ui' ), $version, true );
+	wp_enqueue_style( 'attached-cmb2-attached-posts', $attached_posts_dir . 'css/attached-posts-admin.css', array(), $version );
+
+}
+add_action( 'admin_enqueue_scripts', 'attached_cmb2_enqueue_attached_posts_scripts' );
+
+/**
  * Add a CMB custom field to allow for the selection of multiple posts
  * attached to a single page
  */
-add_action( 'cmb_render_custom_attached_posts', 'cmb_render_custom_attached_posts_callback', 10, 2 );
-function cmb_render_custom_attached_posts_callback( $field, $meta ) {
+add_action( 'cmb2_render_custom_attached_posts', 'cmb2_render_custom_attached_posts_callback', 10, 3);
+function cmb2_render_custom_attached_posts_callback( $field, $field_args, $value ) {
 
 	// Grab our attached posts meta
-	$attached = get_post_meta( get_the_ID(), '_attached_posts', true );
+	$attached = get_post_meta( get_the_ID(), '_attached_cmb2_attached_posts', true );
 
 	// Setup our args
 	$args = array(
@@ -20,12 +36,6 @@ function cmb_render_custom_attached_posts_callback( $field, $meta ) {
 	// Get our posts
 	$posts = get_posts( $args );
 
-	// Build our dropdown
-	if( empty( $meta ) && ! empty( $field['std'] ) )
-		$meta = $field['std'];
-	elseif ( empty( $meta ) && empty ( $field['std'] ) )
-		$meta = array();
-
 	// If there are no posts found, just stop
 	if ( ! $posts )
 		return;
@@ -37,6 +47,8 @@ function cmb_render_custom_attached_posts_callback( $field, $meta ) {
 	echo '<div id="posts-wrap">';
 
 	// Open our retrieved, or found posts, list
+	echo '<div class="retrieved-wrap column-wrap">';
+	echo '<h4 class="attached-posts-section">' . __( 'Available Posts', 'cmb' ) . '</h4>';
 	echo '<ul id="retrieved" class="connected">';
 
 	// Loop through our posts as list items
@@ -52,14 +64,17 @@ function cmb_render_custom_attached_posts_callback( $field, $meta ) {
 		$added = ! empty ( $attached ) && in_array( $post->ID, $attached ) ? ' added' : '';
 
 		// Build our list item
-		echo '<li id="', $post->ID ,'" class="' . $zebra . $added . '">', $post->post_title ,'<span class="sprite add-remove"></span></li>';
+		echo '<li id="', $post->ID ,'" class="' . $zebra . $added . '">', $post->post_title ,'<span class="dashicons dashicons-plus add-remove"></span></li>';
 
 	}
 
 	// Close our retrieved, or found, posts
 	echo '</ul><!-- #retrieved -->';
+	echo '</div><!-- .retrieved-wrap -->';
 
 	// Open our attached posts list
+	echo '<div class="attached-wrap column-wrap">';
+	echo '<h4 class="attached-posts-section">' . __( 'Attached Posts', 'cmb' ) . '</h4>';
 	echo '<ul id="attached" class="connected">';
 
 	// If we have any posts saved already, display them
@@ -67,13 +82,13 @@ function cmb_render_custom_attached_posts_callback( $field, $meta ) {
 
 	// Close up shop
 	echo '</ul><!-- #attached -->';
+	echo '</div><!-- .attached-wrap -->';
 	echo '</div><!-- #posts-wrap -->';
 
 	// Display our description if one exists
-	echo '<p class="cmb_metabox_description">', $field['desc'], '</p>';
+	echo '<p class="cmb_metabox_description">', $field->desc(), '</p>';
 
 }
-
 
 /**
  * Helper function to grab and filter our post meta
@@ -84,12 +99,12 @@ function custom_check_for_attached_posts( $field ) {
 	$output = '';
 
 	// Check to see if we have any meta values saved yet
-	$attached = get_post_meta( get_the_ID(), $field['id'], true );
+	$attached = get_post_meta( get_the_ID(), '_attached_cmb2_attached_posts', true );
 
 	// If we do, then we need to display them as items in our attached list
 	if ( ! $attached ) {
 
-		$output .= '<input type="hidden" name="' . $field['id'] . '">';
+		$output .= '<input type="hidden" name="' . $field->id() . '">';
 
 	} else {
 
@@ -109,66 +124,11 @@ function custom_check_for_attached_posts( $field ) {
 			$zebra = $count % 2 == 0 ? 'even' : 'odd';
 
 			// Build our list item
-			$output .= '<li id="' . $post . '" class="' . $zebra . '">' . get_the_title( $post ) . '<input type="hidden" value="' . $post . '" name="' . $field['id'] . '[]"><span class="sprite add-remove"></span></li>';
+			$output .= '<li id="' . $post . '" class="' . $zebra . '">' . get_the_title( $post ) . '<input type="hidden" value="' . $post . '" name="' . $field->id() . '[]"><span class="dashicons dashicons-minus add-remove"></span></li>';
 		}
 
 	}
 
 	return $output;
-
-}
-
-
-/**
- * Example function on grabbing results from the post meta
- */
-function get_custom_attached_posts() {
-
-	// Check to see if we have attached posts
-	$attached = get_post_meta( get_the_ID(), '_attached_posts', true );
-
-	// Loop through our posts
-	foreach ( $attached as $post ) {
-
-		// Set a class depending on whether or not we have a thumbnail
-		$thumb_class = has_post_thumbnail( $post ) ? 'thumb' : 'no-thumb';
-		$post_class = get_post_class( $thumb_class, $post );
-		$post_class	= implode( ' ', $post_class );
-
-		// Set our title args
-		$title_before	= '<h2 class="title">';
-		$title_after	= '</h2>';
-		$title_before	= $title_before . '<a href="' . esc_url( get_permalink( $post ) ) . '" rel="bookmark" title="' . get_the_title( $post ) . '">';
-		$title_after	= '</a>' . $title_after;
-
-	?>
-
-		<div <?php post_class( $post_class ); ?> id="post-<?php echo $post; ?>">
-
-	<?php
-
-		// Get the post thumbnail
-		echo get_the_post_thumbnail( $post, 'thumbnail' );
-
-		// Begin our single post wrap
-		echo '<div class="single-post-wrap">';
-		echo '<div class="inner">';
-		echo '<header>';
-		echo $title_before . get_the_title( $post ) . $title_after;
-		echo '<div class="post-cat">';
-		the_category();
-		echo '</div>';
-		echo '</header>';
-		echo '<section class="entry">';
-
-		// Get our excerpt
-		the_excerpt();
-
-		// Close some stuff
-		echo '</section><!-- .entry -->';
-		echo '</div><!-- .inner -->';
-		echo '</div><!-- .single-post-wrap -->';
-
-	}
 
 }
