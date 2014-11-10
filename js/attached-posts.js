@@ -75,6 +75,10 @@
 		// Get our dragged item ID
 		var itemID = item.context && item.context.id ? item.context.id : null;
 
+		if ( ! itemID ) {
+			return;
+		}
+
 		// Add the 'added' class to our retrieved column when clicked
 		app.$.attachedPosts.find( '#' + itemID ).addClass('added');
 
@@ -116,7 +120,7 @@
 		$(this).parent().clone().appendTo( app.$.attachedPosts.not( $(this).closest('ul') ) );
 
 		// Add our hidden input field
-		$('<input type="hidden" name="_attached_cmb2_attached_posts[]" value="' + itemID + '">').appendTo( app.$.attachedPosts.find( '#' + itemID ) );
+		$('<input type="hidden" name="_attached_cmb2_attached_posts[]" value="' + itemID + '">').appendTo( app.$.attachedPosts );
 
 		// Replace the plus icon with a minus icon in the attached column
 		app.replacePlusIcon();
