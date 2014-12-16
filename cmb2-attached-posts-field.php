@@ -32,7 +32,7 @@ function cmb2_render_custom_attached_posts_callback( $field, $field_args, $value
 
 	// Setup our args
 	$args = array(
-		'post_type'			=> 'post',
+		'post_type'			=> (isset($field->args['post_type']))?$field->args['post_type']:'post',
 		'posts_per_page'	=> -1,
 		'orderby'			=> 'name',
 		'order'				=> 'ASC',
