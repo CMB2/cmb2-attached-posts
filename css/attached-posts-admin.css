@@ -1,3 +1,7 @@
+.postbox-container .cmb-type-custom-attached-posts .cmb-th + .cmb-td {
+	width: 100%;
+}
+
 .cmb-type-custom-attached-posts label {
 	display: none;
 }
@@ -33,7 +37,7 @@
 	width: 100%;
 }
 
-#attached {
+.attached-posts-wrap .attached {
 	float: right;
 }
 
@@ -52,16 +56,16 @@
 	background: #e6e6e6;
 }
 
-#retrieved li.added {
+.attached-posts-wrap .retrieved li.added {
 	opacity: .5;
 }
 
-#retrieved li.added:hover {
+.attached-posts-wrap .retrieved li.added:hover {
 	background: #fff;
 	cursor: initial;
 }
 
-#retrieved li.added:hover .add-remove {
+.attached-posts-wrap .retrieved li.added:hover .add-remove {
 	background-position: 0 -22px;
 }
 
