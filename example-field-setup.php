@@ -32,7 +32,7 @@ function cmb2_attached_posts_field_metaboxes_example( array $meta_boxes ) {
 				'name'       => __( 'Posts', 'cmb2' ),
 				'id'         => 'cmb_attached_posts',
 				'type'       => 'custom_attached_posts',
-				'desc'       => __( 'Drag posts from the left column to the right column to attach them to this page.<br />You may rearrange the order of the posts in the right column by dragging and dropping.', 'cmb2' )
+				'desc'       => __( 'Drag posts from the left column to the right column to attach them to this page.<br />You may rearrange the order of the posts in the right column by dragging and dropping.', 'cmb2' ),
 			),
 			array(
 				'name'    => __( 'Posts', 'cmb2' ),
