@@ -59,7 +59,7 @@ function cmb2_attached_posts_fields_render( $field, $field_args, $value ) {
 	$count = 0;
 
 	// Wrap our lists
-	echo '<div class="attached-posts-wrap" data-fieldname="'. $field->_name() .'">';
+	echo '<div class="attached-posts-wrap widefat" data-fieldname="'. $field->_name() .'">';
 
 	// Open our retrieved, or found posts, list
 	echo '<div class="retrieved-wrap column-wrap">';
@@ -79,7 +79,7 @@ function cmb2_attached_posts_fields_render( $field, $field_args, $value ) {
 		$added = ! empty ( $attached ) && in_array( $post->ID, $attached ) ? ' added' : '';
 
 		// Build our list item
-		echo '<li data-id="', $post->ID ,'" class="' . $zebra . $added . '">', $post->post_title ,'<span class="dashicons dashicons-plus add-remove"></span></li>';
+		echo '<li data-id="', $post->ID ,'" class="' . $zebra . $added . '"><a title="'. __( 'Edit' ) .'" href="', get_edit_post_link( $post->ID ) ,'">', $post->post_title ,'</a><span class="dashicons dashicons-plus add-remove"></span></li>';
 
 	}
 
@@ -129,7 +129,7 @@ function cmb2_attached_posts_fields_display_attached( $field, $attached ) {
 	$attached = array_filter( $attached );
 
 	// Loop through and build our existing display items
-	foreach ( $attached as $post ) {
+	foreach ( $attached as $post_id ) {
 
 		// Increase our count
 		$count++;
@@ -138,7 +138,7 @@ function cmb2_attached_posts_fields_display_attached( $field, $attached ) {
 		$zebra = $count % 2 == 0 ? 'even' : 'odd';
 
 		// Build our list item
-		echo '<li data-id="' . $post . '" class="' . $zebra . '">' . get_the_title( $post ) . '<input type="hidden" value="' . $post . '" name="' . $field->id() . '[]"><span class="dashicons dashicons-minus add-remove"></span></li>';
+		echo '<li data-id="' . $post_id . '" class="' . $zebra . '"><a title="'. __( 'Edit' ) .'" href="', get_edit_post_link( $post_id ) ,'">'.  get_the_title( $post_id ) .'</a><input type="hidden" value="' . $post_id . '" name="' . $field->id() . '[]"><span class="dashicons dashicons-minus add-remove"></span></li>';
 	}
 
 }
