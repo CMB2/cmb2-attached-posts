@@ -23,8 +23,16 @@ function cmb2_attached_posts_field_scripts_styles() {
 
 	$url = set_url_scheme( $url );
 
-	wp_enqueue_script( 'jquery-ui', $url . 'js/lib/jquery-ui-1.10.4.custom.min.js', array( 'jquery' ), $version, true );
-	wp_enqueue_script( 'cmb2-attached-posts-field', $url . 'js/attached-posts.js', array( 'jquery-ui' ), $version, true );
+	$requirements = array(
+		'jquery-ui-core',
+		'jquery-ui-widget',
+		'jquery-ui-mouse',
+		'jquery-ui-draggable',
+		'jquery-ui-droppable',
+		'jquery-ui-sortable',
+	);
+
+	wp_enqueue_script( 'cmb2-attached-posts-field', $url . 'js/attached-posts.js', $requirements, $version, true );
 	wp_enqueue_style( 'cmb2-attached-posts-field', $url . 'css/attached-posts-admin.css', array(), $version );
 
 }
