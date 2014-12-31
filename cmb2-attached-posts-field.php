@@ -138,6 +138,9 @@ function cmb2_attached_posts_fields_display_attached( $field, $attached ) {
 
 	// Loop through and build our existing display items
 	foreach ( $attached as $post_id ) {
+		if ( ! get_post( $post_id ) ) {
+			continue;
+		}
 
 		// Increase our count
 		$count++;
