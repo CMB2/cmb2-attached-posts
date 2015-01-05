@@ -42,7 +42,7 @@ add_action( 'admin_enqueue_scripts', 'cmb2_attached_posts_field_scripts_styles' 
  * Add a CMB custom field to allow for the selection of multiple posts
  * attached to a single page
  */
-function cmb2_attached_posts_fields_render( $field, $field_args, $value ) {
+function cmb2_attached_posts_fields_render( $field, $escaped_value ) {
 
 	// Setup our args
 	$args = wp_parse_args( (array) $field->options( 'query_args' ), array(
@@ -61,7 +61,7 @@ function cmb2_attached_posts_fields_render( $field, $field_args, $value ) {
 	}
 
 	// Check to see if we have any meta values saved yet
-	$attached = get_post_meta( $field->object_id, $field->_name(), true );
+	$attached = (array) $escaped_value;
 
 	// Set our count class
 	$count = 0;
@@ -112,7 +112,7 @@ function cmb2_attached_posts_fields_render( $field, $field_args, $value ) {
 	echo '<p class="cmb_metabox_description">', $field->desc(), '</p>';
 
 }
-add_action( 'cmb2_render_custom_attached_posts', 'cmb2_attached_posts_fields_render', 10, 3);
+add_action( 'cmb2_render_custom_attached_posts', 'cmb2_attached_posts_fields_render', 10, 2 );
 
 /**
  * Helper function to grab and filter our post meta
