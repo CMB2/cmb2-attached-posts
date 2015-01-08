@@ -1,27 +1,22 @@
 /**
  * Add the drag and drop and sort functionality to the Tiered Template admin
  */
-(function(window, document, $, undefined) {
+window.CMBAP = window.CMBAP || (function(window, document, $, undefined) {
 
-	var app = {
-		postIds : []
-	};
+	var app = { $ : {} };
 
 	app.cache = function() {
-		app.$ = {};
-		app.$.wrap               = $( '.attached-posts-wrap' );
+		var $wrap                = $( '.attached-posts-wrap' );
 		app.$.postIds            = $( '.attached-posts-ids' );
-		app.$.retrievedPosts     = app.$.wrap.find( '.retrieved' );
-		app.$.retrievedPostsItem = app.$.retrievedPosts.find( 'li' );
-		app.$.attachedPosts      = app.$.wrap.find( '.attached' );
-		app.$.attachedPostsItem  = app.$.attachedPosts.find( 'li' );
+		app.$.retrievedPosts     = $wrap.find( '.retrieved' );
+		app.$.attachedPosts      = $wrap.find( '.attached' );
 	};
 
 	app.init = function() {
 		app.cache();
 
 		// Allow the user to drag items from the left list
-		app.$.retrievedPostsItem.draggable({
+		app.$.retrievedPosts.find( 'li' ).draggable({
 			helper: 'clone',
 			revert: 'invalid',
 			stack: '.retrieved li',
@@ -40,22 +35,22 @@
 			}
 		}).disableSelection();
 
-		// Add posts when the plus icon is clicked
-		app.$.retrievedPosts.on( 'click', '.add-remove', app.addPostToColumn);
+		$( '.cmb2-wrap > .cmb2-metabox' )
+			// Add posts when the plus icon is clicked
+			.on( 'click', '.attached-posts-wrap .retrieved .add-remove', app.addPostToColumn )
+			// Remove posts when the minus icon is clicked
+			.on( 'click', '.attached-posts-wrap .attached .add-remove', app.removePostFromColumn );
 
-		// Remove posts when the minus icon is clicked
-		app.$.attachedPosts.on( 'click', '.add-remove', app.removePostFromColumn);
 	};
 
 	// Clone our dragged item
 	app.buildItems = function( item ) {
 
-		var $li       = $( item );
-		var $wrap     = $li.parents( '.attached-posts-wrap' );
+		var $wrap  = $( item ).parents( '.attached-posts-wrap' );
 		// Get the ID of the item being dragged
-		var itemID    = item[0].attributes[0].value;
+		var itemID = item[0].attributes[0].value;
 
-		// If our item is in our post ID array, stop everything
+		// If our item is in our post ID array, stop
 		if ( app.inputHasId( $wrap, itemID ) ) {
 			return;
 		}
@@ -65,14 +60,13 @@
 
 		item.clone().appendTo( app.$.attachedPosts );
 
-		app.resetWrapItems( $wrap );
+		app.resetAttachedListItems( $wrap );
 	};
 
 	// Add the items when the plus icon is clicked
 	app.addPostToColumn = function() {
 
-		var $this  = $(this);
-		var $li    = $this.parent();
+		var $li    = $( this ).parent();
 		var itemID = $li.data( 'id' );
 		var $wrap  = $li.parents( '.attached-posts-wrap' );
 
@@ -80,7 +74,7 @@
 			return;
 		}
 
-		// If our item is in our post ID array, stop everything
+		// If our item is in our post ID array, stop
 		if ( app.inputHasId( $wrap, itemID ) ) {
 			return;
 		}
@@ -91,10 +85,7 @@
 		// Add the item to the right list
 		$wrap.find( '.attached' ).append( $li.clone() );
 
-		app.resetWrapItems( $wrap );
-
-		// Replace the plus icon with a minus icon in the attached column
-		app.replacePlusIcon();
+		app.resetAttachedListItems( $wrap );
 	};
 
 	// Remove items from our attached list when the minus icon is clicked
@@ -111,22 +102,15 @@
 		// Remove the 'added' class from the retrieved column
 		app.$.retrievedPosts.find( '[data-id="' + itemID +'"]' ).removeClass( 'added' );
 
-		app.resetWrapItems( $wrap );
+		app.resetAttachedListItems( $wrap );
 	};
 
 	app.inputHasId = function( $wrap, itemID ) {
 		var $input  = app.getPostIdsInput( $wrap.data( 'fieldname' ) );
 		// Get array
 		var postIds = app.getPostIdsVal( $input );
-		// Get the ID of the item being dragged
-
 		// If our item is in our post ID array, stop everything
 		return $.inArray( itemID, postIds) !== -1;
-	};
-
-	// Replace the plus icon in the attached posts column
-	app.replacePlusIcon = function() {
-		$( '.attached li .dashicons.dashicons-plus' ).removeClass( 'dashicons-plus' ).addClass( 'dashicons-minus' );
 	};
 
 	app.getPostIdsInput = function( fieldName ) {
@@ -138,7 +122,7 @@
 		return val ? val.split( ',' ) : [];
 	};
 
-	app.resetWrapItems = function( $wrap ) {
+	app.resetAttachedListItems = function( $wrap ) {
 		var $input = app.getPostIdsInput( $wrap.data( 'fieldname' ) );
 		var newVal = [];
 
@@ -147,13 +131,21 @@
 			newVal.push( $(this).attr( 'class', zebraClass + ' ui-sortable-handle' ).data( 'id' ) );
 		});
 
+		// Replace the plus icon with a minus icon in the attached column
+		app.replacePlusIcon();
+
 		$input.val( newVal.join( ',' ) );
 	};
 
 	// Re-order items when items are dragged
 	app.resetItems = function( item ) {
 		var $li = $( item );
-		app.resetWrapItems( $li.parents( '.attached-posts-wrap' ) );
+		app.resetAttachedListItems( $li.parents( '.attached-posts-wrap' ) );
+	};
+
+	// Replace the plus icon in the attached posts column
+	app.replacePlusIcon = function() {
+		$( '.attached li .dashicons.dashicons-plus' ).removeClass( 'dashicons-plus' ).addClass( 'dashicons-minus' );
 	};
 
 	jQuery(document).ready( app.init );
