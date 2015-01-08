@@ -4,7 +4,7 @@
  */
 function cmb2_attached_posts_field_scripts_styles() {
 
-	$version = '1.1.0';
+	$version = '1.1.1';
 	$dir = trailingslashit( dirname( __FILE__ ) );
 
 	if ( strtoupper( substr( PHP_OS, 0, 3 ) ) === 'WIN' ) {
@@ -42,7 +42,7 @@ add_action( 'admin_enqueue_scripts', 'cmb2_attached_posts_field_scripts_styles' 
  * Add a CMB custom field to allow for the selection of multiple posts
  * attached to a single page
  */
-function cmb2_attached_posts_fields_render( $field, $escaped_value ) {
+function cmb2_attached_posts_fields_render( $field, $escaped_value, $object_id, $object_type, $field_type ) {
 
 	// Setup our args
 	$args = wp_parse_args( (array) $field->options( 'query_args' ), array(
@@ -67,7 +67,7 @@ function cmb2_attached_posts_fields_render( $field, $escaped_value ) {
 	$count = 0;
 
 	// Wrap our lists
-	echo '<div class="attached-posts-wrap widefat" data-fieldname="'. $field->_name() .'">';
+	echo '<div class="attached-posts-wrap widefat" data-fieldname="'. $field_type->_name() .'">';
 
 	// Open our retrieved, or found posts, list
 	echo '<div class="retrieved-wrap column-wrap">';
@@ -101,18 +101,36 @@ function cmb2_attached_posts_fields_render( $field, $escaped_value ) {
 	echo '<ul class="attached connected">';
 
 	// If we have any posts saved already, display them
-	cmb2_attached_posts_fields_display_attached( $field, $attached );
+	$post_ids = cmb2_attached_posts_fields_display_attached( $field, $attached );
+
+	$value = ! empty( $post_ids ) ? implode( ',', $post_ids ) : '';
 
 	// Close up shop
 	echo '</ul><!-- #attached -->';
 	echo '</div><!-- .attached-wrap -->';
+
+	echo $field_type->input( array(
+		'type'  => 'hidden',
+		'class' => 'attached-posts-ids',
+		'value' => $value,
+		'desc'  => '',
+	) );
+
 	echo '</div><!-- .attached-posts-wrap -->';
 
 	// Display our description if one exists
-	echo '<p class="cmb_metabox_description">', $field->desc(), '</p>';
+	$field_type->_desc( true, true );
 
 }
-add_action( 'cmb2_render_custom_attached_posts', 'cmb2_attached_posts_fields_render', 10, 2 );
+add_action( 'cmb2_render_custom_attached_posts', 'cmb2_attached_posts_fields_render', 10, 5 );
+
+function cmb2_attached_posts_fields_sanitize( $sanitized_val, $val ) {
+	if ( ! empty( $val ) ) {
+		return explode( ',', $val );
+	}
+	return $sanitized_val;
+}
+add_action( 'cmb2_sanitize_custom_attached_posts', 'cmb2_attached_posts_fields_sanitize', 10, 2 );
 
 /**
  * Helper function to grab and filter our post meta
@@ -124,10 +142,7 @@ function cmb2_attached_posts_fields_display_attached( $field, $attached ) {
 
 	// If we do, then we need to display them as items in our attached list
 	if ( ! $attached ) {
-
-		echo '<input type="hidden" name="' . $field->id() . '">';
 		return;
-
 	}
 
 	// Set our count to zero
@@ -135,6 +150,8 @@ function cmb2_attached_posts_fields_display_attached( $field, $attached ) {
 
 	// Remove any empty values
 	$attached = array_filter( $attached );
+
+	$post_ids = array();
 
 	// Loop through and build our existing display items
 	foreach ( $attached as $post_id ) {
@@ -149,7 +166,11 @@ function cmb2_attached_posts_fields_display_attached( $field, $attached ) {
 		$zebra = $count % 2 == 0 ? 'even' : 'odd';
 
 		// Build our list item
-		echo '<li data-id="' . $post_id . '" class="' . $zebra . '"><a title="'. __( 'Edit' ) .'" href="', get_edit_post_link( $post_id ) ,'">'.  get_the_title( $post_id ) .'</a><input type="hidden" value="' . $post_id . '" name="' . $field->id() . '[]"><span class="dashicons dashicons-minus add-remove"></span></li>';
+		echo '<li data-id="' . $post_id . '" class="' . $zebra . '"><a title="'. __( 'Edit' ) .'" href="', get_edit_post_link( $post_id ) ,'">'.  get_the_title( $post_id ) .'</a><span class="dashicons dashicons-minus add-remove"></span></li>';
+
+		$post_ids[] = $post_id;
+
 	}
 
+	return $post_ids;
 }

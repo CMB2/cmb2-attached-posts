@@ -3,11 +3,14 @@
  */
 (function(window, document, $, undefined) {
 
-	var app = {};
+	var app = {
+		postIds : []
+	};
 
 	app.cache = function() {
 		app.$ = {};
 		app.$.wrap               = $( '.attached-posts-wrap' );
+		app.$.postIds            = $( '.attached-posts-ids' );
 		app.$.retrievedPosts     = app.$.wrap.find( '.retrieved' );
 		app.$.retrievedPostsItem = app.$.retrievedPosts.find( 'li' );
 		app.$.attachedPosts      = app.$.wrap.find( '.attached' );
@@ -28,134 +31,129 @@
 		// Allow the right list to be droppable and sortable
 		app.$.attachedPosts.droppable({
 			accept: '.retrieved li',
-			drop: function(event, ui) {
+			drop: function(evt, ui) {
 				app.buildItems( ui.draggable );
 			}
-		}).sortable().disableSelection();
+		}).sortable({
+			stop: function( evt, ui ) {
+				app.resetItems( ui.item );
+			}
+		}).disableSelection();
 
 		// Add posts when the plus icon is clicked
-		app.$.retrievedPosts.on('click', '.add-remove', app.addPostToColumn);
+		app.$.retrievedPosts.on( 'click', '.add-remove', app.addPostToColumn);
 
 		// Remove posts when the minus icon is clicked
-		app.$.attachedPosts.on('click', '.add-remove', app.removePostFromColumn);
+		app.$.attachedPosts.on( 'click', '.add-remove', app.removePostFromColumn);
 	};
 
 	// Clone our dragged item
-	app.buildItems = function(item) {
+	app.buildItems = function( item ) {
 
+		var $li       = $( item );
+		var $wrap     = $li.parents( '.attached-posts-wrap' );
 		// Get the ID of the item being dragged
-		// Start our array
-		var itemID    = item[0].attributes[0].value,
-			itemArray = [];
+		var itemID    = item[0].attributes[0].value;
 
-		// Don't add the item if an item with this ID exists already
-		app.$.attachedPostsItem.each(function() {
-
-			// Get our list item ID
-			var listItemID = $(this).data( 'id' );
-
-			// Add the ID to our array
-			itemArray.push( listItemID );
-		});
-
-		// If our item is not in our post ID array, stop everything
-		if($.inArray(itemID, itemArray) !== -1)
-			return;
-
-		// If we can continue, do so
-		item.clone().appendTo(app.$.attachedPosts);
-		app.attachedAddHiddenField( item );
-	};
-
-	// Add a hidden field when our posts are added.
-	// This saves the ID as post meta
-	app.attachedAddHiddenField = function(item){
-
-		var $li = $( item );
-		var $wrap = $li.parents( '.attached-posts-wrap' );
-		// Get our dragged item ID
-		var itemID = $li.data( 'id' );
-		var fieldName = $wrap.data( 'fieldname' );
-
-		console.log( 'itemID', itemID );
-		console.log( 'fieldName', fieldName );
-		if ( ! itemID ) {
+		// If our item is in our post ID array, stop everything
+		if ( app.inputHasId( $wrap, itemID ) ) {
 			return;
 		}
 
 		// Add the 'added' class to our retrieved column when clicked
-		app.$.retrievedPosts.find( '[data-id="'+ itemID +'"]' ).addClass('added');
+		app.$.retrievedPosts.find( '[data-id="'+ itemID +'"]' ).addClass( 'added' );
 
-		// Add our hidden input
-		$wrap.append( '<input type="hidden" name="'+ fieldName +'[]" value="' + itemID + '">' );
+		item.clone().appendTo( app.$.attachedPosts );
+
+		app.resetWrapItems( $wrap );
 	};
 
 	// Add the items when the plus icon is clicked
-	app.addPostToColumn = function(){
+	app.addPostToColumn = function() {
 
-		var $this = $(this);
-		var $li = $this.parent();
-		var $wrap = $li.parents( '.attached-posts-wrap' );
-		if ($li.hasClass('added'))
-			return;
-
-		// Add the 'added' class when clicked
-		$li.addClass('added');
-
-		var fieldName = $wrap.data( 'fieldname' );
-
-		// Get the clicked item's ID
-		// Start our array
+		var $this  = $(this);
+		var $li    = $this.parent();
 		var itemID = $li.data( 'id' );
-		var itemArray = [];
+		var $wrap  = $li.parents( '.attached-posts-wrap' );
 
-		// Don't add the item if an item with this ID exists already
-		app.$.attachedPostsItem.each(function() {
-
-			// Get our list item ID
-			var listItemID = $this.data( 'id' );
-
-			// Add the ID to our array
-			itemArray.push(listItemID);
-		});
-
-		// If our item is not in our post ID array, stop everything
-		if( $.inArray( itemID, itemArray ) !== -1 ) {
+		if ( $li.hasClass( 'added' ) ) {
 			return;
 		}
+
+		// If our item is in our post ID array, stop everything
+		if ( app.inputHasId( $wrap, itemID ) ) {
+			return;
+		}
+
+		// Add the 'added' class when clicked
+		$li.addClass( 'added' );
 
 		// Add the item to the right list
 		$wrap.find( '.attached' ).append( $li.clone() );
 
-		// Add our hidden input field
-		$wrap.append( '<input type="hidden" name="'+ fieldName +'[]" value="' + itemID + '">' )
+		app.resetWrapItems( $wrap );
 
 		// Replace the plus icon with a minus icon in the attached column
 		app.replacePlusIcon();
 	};
 
 	// Remove items from our attached list when the minus icon is clicked
-	app.removePostFromColumn = function(){
+	app.removePostFromColumn = function() {
 
 		// Get the clicked item's ID
-		var $li = $(this).closest( 'li' );
+		var $li    = $(this).closest( 'li' );
 		var itemID = $li.data( 'id' );
-		var $wrap = $li.parents( '.attached-posts-wrap' );
+		var $wrap  = $li.parents( '.attached-posts-wrap' );
 
 		// Remove the list item
 		$(this).parent().remove();
 
 		// Remove the 'added' class from the retrieved column
 		app.$.retrievedPosts.find( '[data-id="' + itemID +'"]' ).removeClass( 'added' );
-		$wrap.find( '[value="'+ itemID +'"]' ).remove();
+
+		app.resetWrapItems( $wrap );
+	};
+
+	app.inputHasId = function( $wrap, itemID ) {
+		var $input  = app.getPostIdsInput( $wrap.data( 'fieldname' ) );
+		// Get array
+		var postIds = app.getPostIdsVal( $input );
+		// Get the ID of the item being dragged
+
+		// If our item is in our post ID array, stop everything
+		return $.inArray( itemID, postIds) !== -1;
 	};
 
 	// Replace the plus icon in the attached posts column
-	app.replacePlusIcon = function(){
+	app.replacePlusIcon = function() {
+		$( '.attached li .dashicons.dashicons-plus' ).removeClass( 'dashicons-plus' ).addClass( 'dashicons-minus' );
+	};
 
-		$( '.attached li .dashicons' ).removeClass( 'dashicons-plus' );
-		$( '.attached li .dashicons' ).addClass( 'dashicons-minus' );
+	app.getPostIdsInput = function( fieldName ) {
+		return app.$.postIds.filter( '[name="'+ fieldName +'"]' );
+	};
 
+	app.getPostIdsVal = function( $input ) {
+		var val = $input.val();
+		return val ? val.split( ',' ) : [];
+	};
+
+	app.resetWrapItems = function( $wrap ) {
+		var $input = app.getPostIdsInput( $wrap.data( 'fieldname' ) );
+		var newVal = [];
+
+		$wrap.find( '.attached li' ).each( function( index ) {
+			var zebraClass = 0 === index % 2 ? 'odd' : 'even';
+			newVal.push( $(this).attr( 'class', zebraClass + ' ui-sortable-handle' ).data( 'id' ) );
+		});
+
+		$input.val( newVal.join( ',' ) );
+	};
+
+	// Re-order items when items are dragged
+	app.resetItems = function( item ) {
+		var $li = $( item );
+		app.resetWrapItems( $li.parents( '.attached-posts-wrap' ) );
 	};
 
 	jQuery(document).ready( app.init );
