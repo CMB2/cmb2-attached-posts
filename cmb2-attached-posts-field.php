@@ -46,11 +46,14 @@ function cmb2_attached_posts_fields_render( $field, $escaped_value, $object_id, 
 
 	// Setup our args
 	$args = wp_parse_args( (array) $field->options( 'query_args' ), array(
-		'post_type'			=> 'post',
+		'post_type'			=> apply_filters('cmb2_attached_posts_post_type', 'post'),
 		'posts_per_page'	=> 100,
 		'orderby'			=> 'name',
 		'order'				=> 'ASC',
 	) );
+	
+	// Get post type object for attached post type
+	$attached_post_type = get_post_type_object( $args['post_type'] );
 
 	// Get our posts
 	$posts = get_posts( $args );
@@ -71,7 +74,7 @@ function cmb2_attached_posts_fields_render( $field, $escaped_value, $object_id, 
 
 	// Open our retrieved, or found posts, list
 	echo '<div class="retrieved-wrap column-wrap">';
-	echo '<h4 class="attached-posts-section">' . __( 'Available Posts', 'cmb' ) . '</h4>';
+	echo '<h4 class="attached-posts-section">' . sprintf( __( 'Available %s', 'cmb' ), $attached_post_type->labels->name ) . '</h4>';
 	echo '<ul class="retrieved connected">';
 
 	// Loop through our posts as list items
@@ -97,7 +100,7 @@ function cmb2_attached_posts_fields_render( $field, $escaped_value, $object_id, 
 
 	// Open our attached posts list
 	echo '<div class="attached-wrap column-wrap">';
-	echo '<h4 class="attached-posts-section">' . __( 'Attached Posts', 'cmb' ) . '</h4>';
+	echo '<h4 class="attached-posts-section">' . sprintf( __( 'Attached %s', 'cmb' ), $attached_post_type->labels->name ) . '</h4>';
 	echo '<ul class="attached connected">';
 
 	// If we have any posts saved already, display them
