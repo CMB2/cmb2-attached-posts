@@ -46,7 +46,7 @@ function cmb2_attached_posts_fields_render( $field, $escaped_value, $object_id, 
 
 	// Setup our args
 	$args = wp_parse_args( (array) $field->options( 'query_args' ), array(
-		'post_type'			=> apply_filters('cmb2_attached_posts_post_type', 'post'),
+		'post_type'			=> 'post',
 		'posts_per_page'	=> 100,
 		'orderby'			=> 'name',
 		'order'				=> 'ASC',
