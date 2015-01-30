@@ -7,6 +7,8 @@ This requires jQuery UI for drag & drop and sort functionality, which is include
 
 The post IDs are saved in an array, which can be rearranged by dragging and dropping posts in the attached posts column.
 
+If the ability to search for a post and attach it is more in line with what you need, you might consider [CMB2 Post Search field](https://github.com/WebDevStudios/CMB2-Post-Search-field) instead.
+
 ## Installation
 
 Follow the example in `example-field-setup.php` for a demonstration. The example assumes you have both CMB2 and this extension in your mu-plugins directory.
