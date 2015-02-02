@@ -39,8 +39,11 @@ window.CMBAP = window.CMBAP || (function(window, document, $, undefined) {
 			// Add posts when the plus icon is clicked
 			.on( 'click', '.attached-posts-wrap .retrieved .add-remove', app.addPostToColumn )
 			// Remove posts when the minus icon is clicked
-			.on( 'click', '.attached-posts-wrap .attached .add-remove', app.removePostFromColumn );
+			.on( 'click', '.attached-posts-wrap .attached .add-remove', app.removePostFromColumn )
+			// Listen for search events
+			.on( 'keyup', '.attached-posts-wrap input.search', app.handleSearch );
 
+		
 	};
 
 	// Clone our dragged item
@@ -146,6 +149,23 @@ window.CMBAP = window.CMBAP || (function(window, document, $, undefined) {
 	// Replace the plus icon in the attached posts column
 	app.replacePlusIcon = function() {
 		$( '.attached li .dashicons.dashicons-plus' ).removeClass( 'dashicons-plus' ).addClass( 'dashicons-minus' );
+	};
+
+	// Handle searching available list
+	app.handleSearch = function( e ) {
+		var searchQuery = $(e.target).val().toLowerCase(),
+			list = $(e.target).closest( '.column-wrap' ).find( 'ul.connected li' );
+
+		list.each( function() {
+			var el = $(this),
+				elText = el.text().toLowerCase();
+
+			if ( elText.search( searchQuery ) > -1 ) {
+				el.show();
+			} else {
+				el.hide();
+			}
+		} );
 	};
 
 	jQuery(document).ready( app.init );

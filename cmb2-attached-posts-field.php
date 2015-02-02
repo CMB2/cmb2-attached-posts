@@ -75,6 +75,7 @@ function cmb2_attached_posts_fields_render( $field, $escaped_value, $object_id, 
 	// Open our retrieved, or found posts, list
 	echo '<div class="retrieved-wrap column-wrap">';
 	echo '<h4 class="attached-posts-section">' . sprintf( __( 'Available %s', 'cmb' ), $attached_post_type->labels->name ) . '</h4>';
+	echo '<div class="search-wrap"><input type="text" placeholder="Search for ' . sprintf( __( '%s', 'cmb' ), $attached_post_type->labels->name ) . '" class="regular-text search" name="available_search" id="available_search" /></div>';
 	echo '<ul class="retrieved connected">';
 
 	// Loop through our posts as list items
@@ -101,6 +102,7 @@ function cmb2_attached_posts_fields_render( $field, $escaped_value, $object_id, 
 	// Open our attached posts list
 	echo '<div class="attached-wrap column-wrap">';
 	echo '<h4 class="attached-posts-section">' . sprintf( __( 'Attached %s', 'cmb' ), $attached_post_type->labels->name ) . '</h4>';
+	echo '<div class="search-wrap"><input type="text" placeholder="Search for ' . sprintf( __( '%s', 'cmb' ), $attached_post_type->labels->name ) . '" class="regular-text search" name="attached_search" id="attached_search" /></div>';
 	echo '<ul class="attached connected">';
 
 	// If we have any posts saved already, display them
