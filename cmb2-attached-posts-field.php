@@ -51,7 +51,10 @@ function cmb2_attached_posts_fields_render( $field, $escaped_value, $object_id, 
 		'orderby'			=> 'name',
 		'order'				=> 'ASC',
 	) );
-	
+
+	// Check 'filter' setting
+	$use_filter_boxes = $field->options( 'filter_boxes' );
+
 	// Get post type object for attached post type
 	$attached_post_type = get_post_type_object( $args['post_type'] );
 
@@ -75,6 +78,9 @@ function cmb2_attached_posts_fields_render( $field, $escaped_value, $object_id, 
 	// Open our retrieved, or found posts, list
 	echo '<div class="retrieved-wrap column-wrap">';
 	echo '<h4 class="attached-posts-section">' . sprintf( __( 'Available %s', 'cmb' ), $attached_post_type->labels->name ) . '</h4>';
+	if ( $use_filter_boxes ) {
+		echo '<div class="search-wrap"><input type="text" placeholder="Search for ' . sprintf( __( '%s', 'cmb' ), $attached_post_type->labels->name ) . '" class="regular-text search" name="available_search" id="available_search" /></div>';
+	}
 	echo '<ul class="retrieved connected">';
 
 	// Loop through our posts as list items
@@ -101,6 +107,9 @@ function cmb2_attached_posts_fields_render( $field, $escaped_value, $object_id, 
 	// Open our attached posts list
 	echo '<div class="attached-wrap column-wrap">';
 	echo '<h4 class="attached-posts-section">' . sprintf( __( 'Attached %s', 'cmb' ), $attached_post_type->labels->name ) . '</h4>';
+	if ( $use_filter_boxes ) {
+		echo '<div class="search-wrap"><input type="text" placeholder="Search for ' . sprintf( __( '%s', 'cmb' ), $attached_post_type->labels->name ) . '" class="regular-text search" name="attached_search" id="attached_search" /></div>';
+	}
 	echo '<ul class="attached connected">';
 
 	// If we have any posts saved already, display them
