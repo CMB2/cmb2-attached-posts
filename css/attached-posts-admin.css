@@ -37,6 +37,11 @@
 	width: 100%;
 }
 
+.cmb-type-custom-attached-posts .connected img {
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
 .attached-posts-wrap .attached {
 	float: right;
 }

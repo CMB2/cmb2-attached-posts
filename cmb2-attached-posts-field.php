@@ -89,8 +89,11 @@ function cmb2_attached_posts_fields_render( $field, $escaped_value, $object_id, 
 		// Set a class if our post is in our attached post meta
 		$added = ! empty ( $attached ) && in_array( $post->ID, $attached ) ? ' added' : '';
 
+    // Set thumbnail if the options is true
+	  $thumbnail = $field->options( 'show_thumbnails' ) == TRUE ? get_the_post_thumbnail( $post->ID, 'thumbnail' ) : '';
+
 		// Build our list item
-		echo '<li data-id="', $post->ID ,'" class="' . $zebra . $added . '"><a title="'. __( 'Edit' ) .'" href="', get_edit_post_link( $post->ID ) ,'">', $post->post_title ,'</a><span class="dashicons dashicons-plus add-remove"></span></li>';
+		echo '<li data-id="', $post->ID ,'" class="' . $zebra . $added . '">', $thumbnail ,'<a title="'. __( 'Edit' ) .'" href="', get_edit_post_link( $post->ID ) ,'">', $post->post_title ,'</a><span class="dashicons dashicons-plus add-remove"></span></li>';
 
 	}
 
