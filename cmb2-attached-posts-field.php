@@ -7,14 +7,14 @@ function cmb2_attached_posts_field_scripts_styles() {
 	$version = '1.1.1';
 	$dir = trailingslashit( dirname( __FILE__ ) );
 
-	if ( strtoupper( substr( PHP_OS, 0, 3 ) ) === 'WIN' ) {
+	if ( 'WIN' === strtoupper( substr( PHP_OS, 0, 3 ) ) ) {
 		// Windows
 		$content_dir = str_replace( '/', DIRECTORY_SEPARATOR, WP_CONTENT_DIR );
 		$content_url = str_replace( $content_dir, WP_CONTENT_URL, $dir );
 		$url = str_replace( DIRECTORY_SEPARATOR, '/', $content_url );
 
 	} else {
-	  $url = str_replace(
+		$url = str_replace(
 			array( WP_CONTENT_DIR, WP_PLUGIN_DIR ),
 			array( WP_CONTENT_URL, WP_PLUGIN_URL ),
 			$dir
@@ -51,7 +51,7 @@ function cmb2_attached_posts_fields_render( $field, $escaped_value, $object_id, 
 		'orderby'			=> 'name',
 		'order'				=> 'ASC',
 	) );
-	
+
 	// Get post type object for attached post type
 	$attached_post_type = get_post_type_object( $args['post_type'] );
 
@@ -75,7 +75,11 @@ function cmb2_attached_posts_fields_render( $field, $escaped_value, $object_id, 
 	// Open our retrieved, or found posts, list
 	echo '<div class="retrieved-wrap column-wrap">';
 	echo '<h4 class="attached-posts-section">' . sprintf( __( 'Available %s', 'cmb' ), $attached_post_type->labels->name ) . '</h4>';
-	echo '<ul class="retrieved connected">';
+
+	// Set .has_thumbnail
+	$has_thumbnail = $field->options( 'show_thumbnails' ) ? ' has-thumbnails' : '';
+
+	echo '<ul class="retrieved connected', $has_thumbnail ,'">';
 
 	// Loop through our posts as list items
 	foreach ( $posts as $post ) {
@@ -89,8 +93,11 @@ function cmb2_attached_posts_fields_render( $field, $escaped_value, $object_id, 
 		// Set a class if our post is in our attached post meta
 		$added = ! empty ( $attached ) && in_array( $post->ID, $attached ) ? ' added' : '';
 
+		// Set thumbnail if the options is true
+		$thumbnail = $has_thumbnail ? get_the_post_thumbnail( $post->ID, array( 50, 50 ) ) : '';
+
 		// Build our list item
-		echo '<li data-id="', $post->ID ,'" class="' . $zebra . $added . '"><a title="'. __( 'Edit' ) .'" href="', get_edit_post_link( $post->ID ) ,'">', $post->post_title ,'</a><span class="dashicons dashicons-plus add-remove"></span></li>';
+		echo '<li data-id="', $post->ID ,'" class="' . $zebra . $added . '">', $thumbnail ,'<a title="'. __( 'Edit' ) .'" href="', get_edit_post_link( $post->ID ) ,'">', $post->post_title ,'</a><span class="dashicons dashicons-plus add-remove"></span></li>';
 
 	}
 
@@ -101,7 +108,8 @@ function cmb2_attached_posts_fields_render( $field, $escaped_value, $object_id, 
 	// Open our attached posts list
 	echo '<div class="attached-wrap column-wrap">';
 	echo '<h4 class="attached-posts-section">' . sprintf( __( 'Attached %s', 'cmb' ), $attached_post_type->labels->name ) . '</h4>';
-	echo '<ul class="attached connected">';
+
+	echo '<ul class="attached connected', $has_thumbnail ,'">';
 
 	// If we have any posts saved already, display them
 	$post_ids = cmb2_attached_posts_fields_display_attached( $field, $attached );
@@ -151,10 +159,10 @@ function cmb2_attached_posts_fields_display_attached( $field, $attached ) {
 	// Set our count to zero
 	$count = 0;
 
+	$show_thumbnails = $field->options( 'show_thumbnails' );
 	// Remove any empty values
-	$attached = array_filter( $attached );
-
-	$post_ids = array();
+	$attached        = array_filter( $attached );
+	$post_ids        = array();
 
 	// Loop through and build our existing display items
 	foreach ( $attached as $post_id ) {
@@ -168,8 +176,11 @@ function cmb2_attached_posts_fields_display_attached( $field, $attached ) {
 		// Set our zebra stripes
 		$zebra = $count % 2 == 0 ? 'even' : 'odd';
 
+		// Set thumbnail if the options is true
+		$thumbnail = $show_thumbnails ? get_the_post_thumbnail( $post_id, array( 50, 50 ) ) : '';
+
 		// Build our list item
-		echo '<li data-id="' . $post_id . '" class="' . $zebra . '"><a title="'. __( 'Edit' ) .'" href="', get_edit_post_link( $post_id ) ,'">'.  get_the_title( $post_id ) .'</a><span class="dashicons dashicons-minus add-remove"></span></li>';
+		echo '<li data-id="' . $post_id . '" class="' . $zebra . '">', $thumbnail ,'<a title="'. __( 'Edit' ) .'" href="', get_edit_post_link( $post_id ) ,'">'.  get_the_title( $post_id ) .'</a><span class="dashicons dashicons-minus add-remove"></span></li>';
 
 		$post_ids[] = $post_id;
 

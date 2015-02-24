@@ -37,6 +37,24 @@
 	width: 100%;
 }
 
+.cmb-type-custom-attached-posts .has-thumbnails.connected {
+	height: 600px;
+}
+
+.cmb-type-custom-attached-posts .has-thumbnails li {
+	clear: both;
+}
+
+.cmb-type-custom-attached-posts .has-thumbnails li img {
+	margin-right: 10px;
+	vertical-align: middle;
+	float: left;
+}
+
+.cmb-type-custom-attached-posts .has-thumbnails li a {
+	text-indent: 55px;
+}
+
 .attached-posts-wrap .attached {
 	float: right;
 }

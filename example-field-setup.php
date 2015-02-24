@@ -40,7 +40,8 @@ function cmb2_attached_posts_field_metaboxes_example( array $meta_boxes ) {
 				'id'      => $prefix . 'attached_posts',
 				'type'    => 'custom_attached_posts',
 				'options' => array(
-					'query_args' => array( 'posts_per_page' => 10 ), // override the get_posts args
+					'show_thumbnails' => true, // Show thumbnails on the left
+					'query_args'      => array( 'posts_per_page' => 10 ), // override the get_posts args
 				),
 			)
 		),
