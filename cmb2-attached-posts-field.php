@@ -75,7 +75,10 @@ function cmb2_attached_posts_fields_render( $field, $escaped_value, $object_id, 
 	// Open our retrieved, or found posts, list
 	echo '<div class="retrieved-wrap column-wrap">';
 	echo '<h4 class="attached-posts-section">' . sprintf( __( 'Available %s', 'cmb' ), $attached_post_type->labels->name ) . '</h4>';
-	echo '<ul class="retrieved connected">';
+
+  // Set .has_thumbnail
+  $has_thumbnail = $field->options( 'show_thumbnails' ) == TRUE ? ' has-thumbnails' : '';
+	echo '<ul class="retrieved connected', $has_thumbnail ,'">';
 
 	// Loop through our posts as list items
 	foreach ( $posts as $post ) {
@@ -89,8 +92,11 @@ function cmb2_attached_posts_fields_render( $field, $escaped_value, $object_id, 
 		// Set a class if our post is in our attached post meta
 		$added = ! empty ( $attached ) && in_array( $post->ID, $attached ) ? ' added' : '';
 
+    // Set thumbnail if the options is true
+	  $thumbnail = $field->options( 'show_thumbnails' ) == TRUE ? get_the_post_thumbnail( $post->ID, 'thumbnail' ) : '';
+
 		// Build our list item
-		echo '<li data-id="', $post->ID ,'" class="' . $zebra . $added . '"><a title="'. __( 'Edit' ) .'" href="', get_edit_post_link( $post->ID ) ,'">', $post->post_title ,'</a><span class="dashicons dashicons-plus add-remove"></span></li>';
+		echo '<li data-id="', $post->ID ,'" class="' . $zebra . $added . '">', $thumbnail ,'<a title="'. __( 'Edit' ) .'" href="', get_edit_post_link( $post->ID ) ,'">', $post->post_title ,'</a><span class="dashicons dashicons-plus add-remove"></span></li>';
 
 	}
 
@@ -101,7 +107,8 @@ function cmb2_attached_posts_fields_render( $field, $escaped_value, $object_id, 
 	// Open our attached posts list
 	echo '<div class="attached-wrap column-wrap">';
 	echo '<h4 class="attached-posts-section">' . sprintf( __( 'Attached %s', 'cmb' ), $attached_post_type->labels->name ) . '</h4>';
-	echo '<ul class="attached connected">';
+  $has_thumbnail = $field->options( 'show_thumbnails' ) == TRUE ? ' has-thumbnails' : '';
+	echo '<ul class="attached connected', $has_thumbnail ,'">';
 
 	// If we have any posts saved already, display them
 	$post_ids = cmb2_attached_posts_fields_display_attached( $field, $attached );
@@ -167,9 +174,12 @@ function cmb2_attached_posts_fields_display_attached( $field, $attached ) {
 
 		// Set our zebra stripes
 		$zebra = $count % 2 == 0 ? 'even' : 'odd';
+    
+    // Set thumbnail if the options is true
+	  $thumbnail = $field->options( 'show_thumbnails' ) == TRUE ? get_the_post_thumbnail( $post_id, 'thumbnail' ) : '';
 
 		// Build our list item
-		echo '<li data-id="' . $post_id . '" class="' . $zebra . '"><a title="'. __( 'Edit' ) .'" href="', get_edit_post_link( $post_id ) ,'">'.  get_the_title( $post_id ) .'</a><span class="dashicons dashicons-minus add-remove"></span></li>';
+		echo '<li data-id="' . $post_id . '" class="' . $zebra . '">', $thumbnail ,'<a title="'. __( 'Edit' ) .'" href="', get_edit_post_link( $post_id ) ,'">'.  get_the_title( $post_id ) .'</a><span class="dashicons dashicons-minus add-remove"></span></li>';
 
 		$post_ids[] = $post_id;
 
