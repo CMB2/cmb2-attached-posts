@@ -4,7 +4,7 @@
  */
 function cmb2_attached_posts_field_scripts_styles() {
 
-	$version = '1.1.1';
+	$version = '1.1.2';
 	$dir = trailingslashit( dirname( __FILE__ ) );
 
 	if ( 'WIN' === strtoupper( substr( PHP_OS, 0, 3 ) ) ) {
