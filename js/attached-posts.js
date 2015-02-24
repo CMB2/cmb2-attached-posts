@@ -58,7 +58,7 @@ window.CMBAP = window.CMBAP || (function(window, document, $, undefined) {
 		// Add the 'added' class to our retrieved column when clicked
 		app.$.retrievedPosts.find( '[data-id="'+ itemID +'"]' ).addClass( 'added' );
 
-		item.clone().appendTo( app.$.attachedPosts );
+		item.clone().appendTo( $( '.attached', $wrap ) );
 
 		app.resetAttachedListItems( $wrap );
 	};
