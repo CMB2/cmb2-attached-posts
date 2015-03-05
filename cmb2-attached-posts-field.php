@@ -97,7 +97,7 @@ function cmb2_attached_posts_fields_render( $field, $escaped_value, $object_id, 
 		$thumbnail = $has_thumbnail ? get_the_post_thumbnail( $post->ID, array( 50, 50 ) ) : '';
 
 		// Build our list item
-		echo '<li data-id="', $post->ID ,'" class="' . $zebra . $added . '">', $thumbnail ,'<a title="'. __( 'Edit' ) .'" href="', get_edit_post_link( $post->ID ) ,'">', $post->post_title ,'</a><span class="dashicons dashicons-plus add-remove"></span></li>';
+		echo '<li data-id="', $post->ID ,'" class="' . $zebra . $added . '">', $thumbnail ,'<a title="'. __( 'Edit' ) .'" href="', get_edit_post_link( $post ) ,'">', get_the_title( $post ) ,'</a><span class="dashicons dashicons-plus add-remove"></span></li>';
 
 	}
 
