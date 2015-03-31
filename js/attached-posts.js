@@ -7,7 +7,6 @@ window.CMBAP = window.CMBAP || (function(window, document, $, undefined) {
 
 	app.cache = function() {
 		var $wrap                = $( '.attached-posts-wrap' );
-		app.$.postIds            = $( '.attached-posts-ids' );
 		app.$.retrievedPosts     = $wrap.find( '.retrieved' );
 		app.$.attachedPosts      = $wrap.find( '.attached' );
 	};
@@ -56,7 +55,7 @@ window.CMBAP = window.CMBAP || (function(window, document, $, undefined) {
 		}
 
 		// Add the 'added' class to our retrieved column when clicked
-		app.$.retrievedPosts.find( '[data-id="'+ itemID +'"]' ).addClass( 'added' );
+		$wrap.find( '.retrieved li[data-id="'+ itemID +'"]' ).addClass( 'added' );
 
 		item.clone().appendTo( $wrap.find( '.attached' ) );
 
@@ -100,21 +99,21 @@ window.CMBAP = window.CMBAP || (function(window, document, $, undefined) {
 		$(this).parent().remove();
 
 		// Remove the 'added' class from the retrieved column
-		app.$.retrievedPosts.find( '[data-id="' + itemID +'"]' ).removeClass( 'added' );
+		$wrap.find('.retrieved li[data-id="' + itemID +'"]').removeClass('added');
 
 		app.resetAttachedListItems( $wrap );
 	};
 
 	app.inputHasId = function( $wrap, itemID ) {
-		var $input  = app.getPostIdsInput( $wrap.data( 'fieldname' ) );
+		var $input  = app.getPostIdsInput( $wrap );
 		// Get array
 		var postIds = app.getPostIdsVal( $input );
 		// If our item is in our post ID array, stop everything
 		return $.inArray( itemID, postIds) !== -1;
 	};
 
-	app.getPostIdsInput = function( fieldName ) {
-		return app.$.postIds.filter( '[name="'+ fieldName +'"]' );
+	app.getPostIdsInput = function( $wrap ) {
+		return $wrap.find('.attached-posts-ids');
 	};
 
 	app.getPostIdsVal = function( $input ) {
@@ -123,7 +122,7 @@ window.CMBAP = window.CMBAP || (function(window, document, $, undefined) {
 	};
 
 	app.resetAttachedListItems = function( $wrap ) {
-		var $input = app.getPostIdsInput( $wrap.data( 'fieldname' ) );
+		var $input = app.getPostIdsInput( $wrap );
 		var newVal = [];
 
 		$wrap.find( '.attached li' ).each( function( index ) {
