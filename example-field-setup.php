@@ -20,9 +20,6 @@ if ( ! function_exists( 'cmb2_attached_posts_fields_render' ) ) {
  */
 function cmb2_attached_posts_field_metaboxes_example() {
 
-	// Start with an underscore to hide fields from custom fields list
-	$prefix = '_attached_cmb2_';
-
 	$example_meta = new_cmb2_box( array(
 		'id'           => 'cmb2_attached_posts_field',
 		'title'        => __( 'Attached Posts', 'cmb2' ),
@@ -35,7 +32,7 @@ function cmb2_attached_posts_field_metaboxes_example() {
 	$example_meta->add_field( array(
 		'name'    => __( 'Attached Posts', 'cmb2' ),
 		'desc'    => __( 'Drag posts from the left column to the right column to attach them to this page.<br />You may rearrange the order of the posts in the right column by dragging and dropping.', 'cmb2' ),
-		'id'      => $prefix . 'attached_posts',
+		'id'      => 'attached_cmb2_attached_posts',
 		'type'    => 'custom_attached_posts',
 		'options' => array(
 			'show_thumbnails' => true, // Show thumbnails on the left
