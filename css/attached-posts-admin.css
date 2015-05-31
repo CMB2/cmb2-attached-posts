@@ -28,6 +28,11 @@
 	margin-bottom: 5px;
 }
 
+.cmb-type-custom-attached-posts .search-wrap .regular-text {
+	width: 100%;
+	margin: 0 0 7px 0;
+}
+
 .cmb-type-custom-attached-posts .connected {
 	background: #F4F4F4;
 	cursor: pointer;

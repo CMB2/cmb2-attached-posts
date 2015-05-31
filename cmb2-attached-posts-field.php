@@ -46,6 +46,11 @@ class WDS_CMB2_Attached_Posts_Field {
 		// Get post type object for attached post type
 		$attached_post_type = get_post_type_object( $args['post_type'] );
 
+		// Check 'filter' setting
+		$filter_boxes = $field->options( 'filter_boxes' )
+			? '<div class="search-wrap"><input type="text" placeholder="' . sprintf( __( 'Filter %s', 'cmb' ), $attached_post_type->labels->name ) . '" class="regular-text search" name="%s" /></div>'
+			: '';
+
 		// Get our posts
 		$posts = get_posts( $args );
 
@@ -69,6 +74,10 @@ class WDS_CMB2_Attached_Posts_Field {
 
 		// Set .has_thumbnail
 		$has_thumbnail = $field->options( 'show_thumbnails' ) ? ' has-thumbnails' : '';
+
+		if ( $filter_boxes ) {
+			printf( $filter_boxes, 'available-search' );
+		}
 
 		echo '<ul class="retrieved connected', $has_thumbnail ,'">';
 
@@ -99,6 +108,10 @@ class WDS_CMB2_Attached_Posts_Field {
 		// Open our attached posts list
 		echo '<div class="attached-wrap column-wrap">';
 		echo '<h4 class="attached-posts-section">' . sprintf( __( 'Attached %s', 'cmb' ), $attached_post_type->labels->name ) . '</h4>';
+
+		if ( $filter_boxes ) {
+			printf( $filter_boxes, 'attached-search' );
+		}
 
 		echo '<ul class="attached connected', $has_thumbnail ,'">';
 
@@ -143,8 +156,8 @@ class WDS_CMB2_Attached_Posts_Field {
 
 		$show_thumbnails = $field->options( 'show_thumbnails' );
 		// Remove any empty values
-		$attached		= array_filter( $attached );
-		$post_ids		= array();
+		$attached = array_filter( $attached );
+		$post_ids = array();
 
 		// Loop through and build our existing display items
 		foreach ( $attached as $post_id ) {
