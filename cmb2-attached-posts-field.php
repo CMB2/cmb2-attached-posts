@@ -3,35 +3,36 @@
 Plugin Name: CMB2 Field Type: Attached Posts
 Plugin URI: https://github.com/WebDevStudios/cmb2-attached-posts
 Description: Attached posts field type for CMB2.
-Version: 1.0.0
-Author: Web Dev Studios
+Version: 1.2.0
+Author: WebDevStudios
 Author URI: http://webdevstudios.com
 License: GPLv2+
 */
 
 /**
- * Class WDS_CMB2_Field_Attached_Posts
+ * Class WDS_CMB2_Attached_Posts_Field
  */
-class WDS_CMB2_Field_Attached_Posts {
-	
+class WDS_CMB2_Attached_Posts_Field {
+
 	/**
 	 * Current version number
 	 */
-	const VERSION = '2.1.1';
+	const VERSION = '1.2.0';
 
 	/**
 	 * Initialize the plugin by hooking into CMB2
 	 */
 	public function __construct() {
-		add_action( 'cmb2_render_custom_attached_posts', array( $this, 'cmb2_attached_posts_fields_render' ), 10, 5 );
-		add_action( 'cmb2_sanitize_custom_attached_posts', array( $this, 'cmb2_attached_posts_fields_sanitize' ), 10, 2 );
+		add_action( 'cmb2_render_custom_attached_posts', array( $this, 'render' ), 10, 5 );
+		add_action( 'cmb2_sanitize_custom_attached_posts', array( $this, 'sanitize' ), 10, 2 );
 	}
 
 	/**
 	 * Add a CMB custom field to allow for the selection of multiple posts
 	 * attached to a single page
 	 */
-	public function cmb2_attached_posts_fields_render( $field, $escaped_value, $object_id, $object_type, $field_type ) {
+	public function render( $field, $escaped_value, $object_id, $object_type, $field_type ) {
+
 		$this->setup_admin_scripts();
 
 		// Setup our args
@@ -102,7 +103,7 @@ class WDS_CMB2_Field_Attached_Posts {
 		echo '<ul class="attached connected', $has_thumbnail ,'">';
 
 		// If we have any posts saved already, display them
-		$post_ids = $this->cmb2_attached_posts_fields_display_attached( $field, $attached );
+		$post_ids = $this->display_attached( $field, $attached );
 
 		$value = ! empty( $post_ids ) ? implode( ',', $post_ids ) : '';
 
@@ -123,20 +124,11 @@ class WDS_CMB2_Field_Attached_Posts {
 		$field_type->_desc( true, true );
 
 	}
-	
-
-	public function cmb2_attached_posts_fields_sanitize( $sanitized_val, $val ) {
-		if ( ! empty( $val ) ) {
-			return explode( ',', $val );
-		}
-		return $sanitized_val;
-	}
-	
 
 	/**
 	 * Helper function to grab and filter our post meta
 	 */
-	private function cmb2_attached_posts_fields_display_attached( $field, $attached ) {
+	protected function display_attached( $field, $attached ) {
 
 		// Start with nothing
 		$output = '';
@@ -178,11 +170,18 @@ class WDS_CMB2_Field_Attached_Posts {
 
 		return $post_ids;
 	}
-	
+
+	public function sanitize( $sanitized_val, $val ) {
+		if ( ! empty( $val ) ) {
+			return explode( ',', $val );
+		}
+		return $sanitized_val;
+	}
+
 	/**
 	 * Enqueue admin scripts for our attached posts field
 	 */
-	private function setup_admin_scripts() {
+	protected function setup_admin_scripts() {
 		$dir = trailingslashit( dirname( __FILE__ ) );
 
 		if ( 'WIN' === strtoupper( substr( PHP_OS, 0, 3 ) ) ) {
@@ -215,4 +214,4 @@ class WDS_CMB2_Field_Attached_Posts {
 
 	}
 }
-$wds_cmb2_field_attached_posts = new WDS_CMB2_Field_Attached_Posts();
+$cmb2_attached_posts_field = new WDS_CMB2_Attached_Posts_Field();
