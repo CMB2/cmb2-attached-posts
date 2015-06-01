@@ -57,9 +57,11 @@ class WDS_CMB2_Attached_Posts_Field {
 			$post_type_labels[] = $attached_post_type->labels->name;
 		}
 
+		$post_type_labels = implode( '/', $post_type_labels );
+
 		// Check 'filter' setting
 		$filter_boxes = $field->options( 'filter_boxes' )
-			? '<div class="search-wrap"><input type="text" placeholder="' . sprintf( __( 'Filter %s', 'cmb' ), implode( '/', $post_type_labels ) ) . '" class="regular-text search" name="%s" /></div>'
+			? '<div class="search-wrap"><input type="text" placeholder="' . sprintf( __( 'Filter %s', 'cmb' ), $post_type_labels ) . '" class="regular-text search" name="%s" /></div>'
 			: '';
 
 		// Get our posts
@@ -81,7 +83,7 @@ class WDS_CMB2_Attached_Posts_Field {
 
 		// Open our retrieved, or found posts, list
 		echo '<div class="retrieved-wrap column-wrap">';
-		echo '<h4 class="attached-posts-section">' . sprintf( __( 'Available %s', 'cmb' ), implode( '/', $post_type_labels ) ) . '</h4>';
+		echo '<h4 class="attached-posts-section">' . sprintf( __( 'Available %s', 'cmb' ), $post_type_labels ) . '</h4>';
 
 		// Set .has_thumbnail
 		$has_thumbnail = $field->options( 'show_thumbnails' ) ? ' has-thumbnails' : '';
@@ -118,7 +120,7 @@ class WDS_CMB2_Attached_Posts_Field {
 
 		// Open our attached posts list
 		echo '<div class="attached-wrap column-wrap">';
-		echo '<h4 class="attached-posts-section">' . sprintf( __( 'Attached %s', 'cmb' ), implode( '/', $post_type_labels ) ) . '</h4>';
+		echo '<h4 class="attached-posts-section">' . sprintf( __( 'Attached %s', 'cmb' ), $post_type_labels ) . '</h4>';
 
 		if ( $filter_boxes ) {
 			printf( $filter_boxes, 'attached-search' );
