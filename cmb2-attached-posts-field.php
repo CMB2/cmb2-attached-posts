@@ -43,12 +43,23 @@ class WDS_CMB2_Attached_Posts_Field {
 			'order'				=> 'ASC',
 		) );
 
-		// Get post type object for attached post type
-		$attached_post_type = get_post_type_object( $args['post_type'] );
+		// loop through post types to get labels for all
+		$post_type_labels = array();
+		foreach ( (array) $args['post_type'] as $post_type ) {
+			// Get post type object for attached post type
+			$attached_post_type = get_post_type_object( $post_type );
+
+			// continue if we don't have a label for the post type
+			if ( ! $attached_post_type || ! isset( $attached_post_type->labels->name ) ) {
+				continue;
+			}
+
+			$post_type_labels[] = $attached_post_type->labels->name;
+		}
 
 		// Check 'filter' setting
 		$filter_boxes = $field->options( 'filter_boxes' )
-			? '<div class="search-wrap"><input type="text" placeholder="' . sprintf( __( 'Filter %s', 'cmb' ), $attached_post_type->labels->name ) . '" class="regular-text search" name="%s" /></div>'
+			? '<div class="search-wrap"><input type="text" placeholder="' . sprintf( __( 'Filter %s', 'cmb' ), implode( '/', $post_type_labels ) ) . '" class="regular-text search" name="%s" /></div>'
 			: '';
 
 		// Get our posts
