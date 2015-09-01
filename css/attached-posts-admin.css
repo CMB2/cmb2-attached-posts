@@ -2,10 +2,6 @@
 	width: 100%;
 }
 
-.cmb-type-custom-attached-posts label {
-	display: none;
-}
-
 .cmb-type-custom-attached-posts .cmb-type-custom_attached_posts {
 	padding-top: 0;
 }
