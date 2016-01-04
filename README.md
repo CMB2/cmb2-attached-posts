@@ -30,3 +30,9 @@ foreach ( $attached as $attached_post ) {
 ```
 
 Once you have the post data for the post ID, you can proceed with the desired functionality relating to each attached post.
+
+
+## Screenshots
+
+1. Field display  
+![Field display](https://raw.githubusercontent.com/WebDevStudios/cmb2-attached-posts/master/attached-posts-field.png)`
