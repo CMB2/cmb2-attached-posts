@@ -87,12 +87,13 @@ class WDS_CMB2_Attached_Posts_Field {
 
 		// Set .has_thumbnail
 		$has_thumbnail = $field->options( 'show_thumbnails' ) ? ' has-thumbnails' : '';
+		$hide_selected = $field->options( 'hide_selected' ) ? ' hide-selected' : '';
 
 		if ( $filter_boxes ) {
 			printf( $filter_boxes, 'available-search' );
 		}
 
-		echo '<ul class="retrieved connected', $has_thumbnail ,'">';
+		echo '<ul class="retrieved connected' . $has_thumbnail . $hide_selected . '">';
 
 		// Loop through our posts as list items
 		foreach ( $posts as $post ) {

@@ -97,3 +97,7 @@
 	top: 50%;
 	width: 22px;
 }
+
+ul.hide-selected li.added{
+    display: none;
+}
