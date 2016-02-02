@@ -69,6 +69,7 @@ class WDS_CMB2_Attached_Posts_Field {
 
 		// If there are no posts found, just stop
 		if ( ! $posts ) {
+			printf( __( 'No entries found for the %s post types' , 'cmb' ), $post_type_labels );
 			return;
 		}
 
