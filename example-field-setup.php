@@ -7,10 +7,7 @@
  * Get the bootstrap! If using as a plugin, REMOVE THIS!
  */
 require_once WPMU_PLUGIN_DIR . '/cmb2/init.php';
-
-if ( ! function_exists( 'cmb2_attached_posts_fields_render' ) ) {
-	require_once WPMU_PLUGIN_DIR . '/cmb2-attached-posts/cmb2-attached-posts-field.php';
-}
+require_once WPMU_PLUGIN_DIR . '/cmb2-attached-posts/cmb2-attached-posts-field.php';
 
 /**
  * Define the metabox and field configurations.

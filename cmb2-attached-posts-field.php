@@ -1,244 +1,159 @@
 <?php
-/*
-Plugin Name: CMB2 Field Type: Attached Posts
-Plugin URI: https://github.com/WebDevStudios/cmb2-attached-posts
-Description: Attached posts field type for CMB2.
-Version: 1.2.2
-Author: WebDevStudios
-Author URI: http://webdevstudios.com
-License: GPLv2+
-*/
+/**
+ * Plugin Name: CMB2 Field Type: Attached Posts
+ * Plugin URI: https://github.com/WebDevStudios/cmb2-attached-posts
+ * Description: Attached posts field type for CMB2.
+ * Version: 1.2.3
+ * Author: WebDevStudios
+ * Author URI: http://webdevstudios.com
+ * License: GPLv2+
+ */
 
 /**
- * Class WDS_CMB2_Attached_Posts_Field
+ * WDS_CMB2_Attached_Posts_Field loader
+ *
+ * Handles checking for and smartly loading the newest version of this library.
+ *
+ * @category  WordPressLibrary
+ * @package   WDS_CMB2_Attached_Posts_Field
+ * @author    WebDevStudios <contact@webdevstudios.com>
+ * @copyright 2016 WebDevStudios <contact@webdevstudios.com>
+ * @license   GPL-2.0+
+ * @version   1.2.3
+ * @link      https://github.com/WebDevStudios/cmb2-attached-posts
+ * @since     1.2.3
  */
-class WDS_CMB2_Attached_Posts_Field {
+
+/**
+ * Copyright (c) 2016 WebDevStudios (email : contact@webdevstudios.com)
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2 or, at
+ * your discretion, any later version, as published by the Free
+ * Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+/**
+ * Loader versioning: http://jtsternberg.github.io/wp-lib-loader/
+ */
+
+if ( ! class_exists( 'WDS_CMB2_Attached_Posts_Field_123', false ) ) {
 
 	/**
-	 * Current version number
+	 * Versioned loader class-name
+	 *
+	 * This ensures each version is loaded/checked.
+	 *
+	 * @category WordPressLibrary
+	 * @package  WDS_CMB2_Attached_Posts_Field
+	 * @author   WebDevStudios <contact@webdevstudios.com>
+	 * @license  GPL-2.0+
+	 * @version  1.2.3
+	 * @link     https://github.com/WebDevStudios/cmb2-attached-posts
+	 * @since    1.2.3
 	 */
-	const VERSION = '1.2.2';
+	class WDS_CMB2_Attached_Posts_Field_123 {
 
-	/**
-	 * Initialize the plugin by hooking into CMB2
-	 */
-	public function __construct() {
-		add_action( 'cmb2_render_custom_attached_posts', array( $this, 'render' ), 10, 5 );
-		add_action( 'cmb2_sanitize_custom_attached_posts', array( $this, 'sanitize' ), 10, 2 );
-	}
+		/**
+		 * WDS_CMB2_Attached_Posts_Field version number
+		 * @var   string
+		 * @since 1.2.3
+		 */
+		const VERSION = '1.2.3';
 
-	/**
-	 * Add a CMB custom field to allow for the selection of multiple posts
-	 * attached to a single page
-	 */
-	public function render( $field, $escaped_value, $object_id, $object_type, $field_type ) {
+		/**
+		 * Current version hook priority.
+		 * Will decrement with each release
+		 *
+		 * @var   int
+		 * @since 1.2.3
+		 */
+		const PRIORITY = 9999;
 
-		$this->setup_admin_scripts();
-
-		// Setup our args
-		$args = wp_parse_args( (array) $field->options( 'query_args' ), array(
-			'post_type'			=> 'post',
-			'posts_per_page'	=> 100,
-			'orderby'			=> 'name',
-			'order'				=> 'ASC',
-		) );
-
-		// loop through post types to get labels for all
-		$post_type_labels = array();
-		foreach ( (array) $args['post_type'] as $post_type ) {
-			// Get post type object for attached post type
-			$attached_post_type = get_post_type_object( $post_type );
-
-			// continue if we don't have a label for the post type
-			if ( ! $attached_post_type || ! isset( $attached_post_type->labels->name ) ) {
-				continue;
+		/**
+		 * Starts the version checking process.
+		 * Creates CMB2_ATTACHED_POSTS_FIELD_LOADED definition for early detection by
+		 * other scripts.
+		 *
+		 * Hooks WDS_CMB2_Attached_Posts_Field inclusion to the cmb2_attached_posts_field_load hook
+		 * on a high priority which decrements (increasing the priority) with
+		 * each version release.
+		 *
+		 * @since 1.2.3
+		 */
+		public function __construct() {
+			if ( ! defined( 'CMB2_ATTACHED_POSTS_FIELD_LOADED' ) ) {
+				/**
+				 * A constant you can use to check if WDS_CMB2_Attached_Posts_Field is loaded
+				 * for your plugins/themes with WDS_CMB2_Attached_Posts_Field dependency.
+				 *
+				 * Can also be used to determine the priority of the hook
+				 * in use for the currently loaded version.
+				 */
+				define( 'CMB2_ATTACHED_POSTS_FIELD_LOADED', self::PRIORITY );
 			}
 
-			$post_type_labels[] = $attached_post_type->labels->name;
+			// Use the hook system to ensure only the newest version is loaded.
+			add_action( 'cmb2_attached_posts_field_load', array( $this, 'include_lib' ), self::PRIORITY );
+
+			// Use the hook system to ensure only the newest version is loaded.
+			add_action( 'after_setup_theme', array( $this, 'do_hook' ) );
 		}
 
-		$post_type_labels = implode( '/', $post_type_labels );
-
-		// Check 'filter' setting
-		$filter_boxes = $field->options( 'filter_boxes' )
-			? '<div class="search-wrap"><input type="text" placeholder="' . sprintf( __( 'Filter %s', 'cmb' ), $post_type_labels ) . '" class="regular-text search" name="%s" /></div>'
-			: '';
-
-		// Get our posts
-		$posts = get_posts( $args );
-
-		// If there are no posts found, just stop
-		if ( ! $posts ) {
-			return;
+		/**
+		 * Fires the cmb2_attached_posts_field_load action hook
+		 * (from the after_setup_theme hook).
+		 *
+		 * @since 1.2.3
+		 */
+		public function do_hook() {
+			// Then fire our hook.
+			do_action( 'cmb2_attached_posts_field_load' );
 		}
 
-		// Check to see if we have any meta values saved yet
-		$attached = (array) $escaped_value;
-
-		// Set our count class
-		$count = 0;
-
-		// Wrap our lists
-		echo '<div class="attached-posts-wrap widefat" data-fieldname="'. $field_type->_name() .'">';
-
-		// Open our retrieved, or found posts, list
-		echo '<div class="retrieved-wrap column-wrap">';
-		echo '<h4 class="attached-posts-section">' . sprintf( __( 'Available %s', 'cmb' ), $post_type_labels ) . '</h4>';
-
-		// Set .has_thumbnail
-		$has_thumbnail = $field->options( 'show_thumbnails' ) ? ' has-thumbnails' : '';
-		$hide_selected = $field->options( 'hide_selected' ) ? ' hide-selected' : '';
-
-		if ( $filter_boxes ) {
-			printf( $filter_boxes, 'available-search' );
-		}
-
-		echo '<ul class="retrieved connected' . $has_thumbnail . $hide_selected . '">';
-
-		// Loop through our posts as list items
-		foreach ( $posts as $post ) {
-
-			// Increase our count
-			$count++;
-
-			// Set our zebra stripes
-			$zebra = $count % 2 == 0 ? 'even' : 'odd';
-
-			// Set a class if our post is in our attached post meta
-			$added = ! empty ( $attached ) && in_array( $post->ID, $attached ) ? ' added' : '';
-
-			// Set thumbnail if the options is true
-			$thumbnail = $has_thumbnail ? get_the_post_thumbnail( $post->ID, array( 50, 50 ) ) : '';
-
-			// Build our list item
-			echo '<li data-id="', $post->ID ,'" class="' . $zebra . $added . '">', $thumbnail ,'<a title="'. __( 'Edit' ) .'" href="', get_edit_post_link( $post ) ,'">', get_the_title( $post ) ,'</a><span class="dashicons dashicons-plus add-remove"></span></li>';
-
-		}
-
-		// Close our retrieved, or found, posts
-		echo '</ul><!-- .retrieved -->';
-		echo '</div><!-- .retrieved-wrap -->';
-
-		// Open our attached posts list
-		echo '<div class="attached-wrap column-wrap">';
-		echo '<h4 class="attached-posts-section">' . sprintf( __( 'Attached %s', 'cmb' ), $post_type_labels ) . '</h4>';
-
-		if ( $filter_boxes ) {
-			printf( $filter_boxes, 'attached-search' );
-		}
-
-		echo '<ul class="attached connected', $has_thumbnail ,'">';
-
-		// If we have any posts saved already, display them
-		$post_ids = $this->display_attached( $field, $attached );
-
-		$value = ! empty( $post_ids ) ? implode( ',', $post_ids ) : '';
-
-		// Close up shop
-		echo '</ul><!-- #attached -->';
-		echo '</div><!-- .attached-wrap -->';
-
-		echo $field_type->input( array(
-			'type'  => 'hidden',
-			'class' => 'attached-posts-ids',
-			'value' => $value,
-			'desc'  => '',
-		) );
-
-		echo '</div><!-- .attached-posts-wrap -->';
-
-		// Display our description if one exists
-		$field_type->_desc( true, true );
-
-	}
-
-	/**
-	 * Helper function to grab and filter our post meta
-	 */
-	protected function display_attached( $field, $attached ) {
-
-		// Start with nothing
-		$output = '';
-
-		// If we do, then we need to display them as items in our attached list
-		if ( ! $attached ) {
-			return;
-		}
-
-		// Set our count to zero
-		$count = 0;
-
-		$show_thumbnails = $field->options( 'show_thumbnails' );
-		// Remove any empty values
-		$attached = array_filter( $attached );
-		$post_ids = array();
-
-		// Loop through and build our existing display items
-		foreach ( $attached as $post_id ) {
-			if ( ! get_post( $post_id ) ) {
-				continue;
+		/**
+		 * A final check if WDS_CMB2_Attached_Posts_Field exists before kicking off
+		 * our WDS_CMB2_Attached_Posts_Field loading.
+		 *
+		 * CMB2_ATTACHED_POSTS_FIELD_VERSION and CMB2_ATTACHED_POSTS_FIELD_DIR constants are
+		 * set at this point.
+		 *
+		 * @since  1.2.3
+		 */
+		public function include_lib() {
+			if ( class_exists( 'WDS_CMB2_Attached_Posts_Field', false ) ) {
+				return;
 			}
 
-			// Increase our count
-			$count++;
+			if ( ! defined( 'CMB2_ATTACHED_POSTS_FIELD_VERSION' ) ) {
+				/**
+				 * Defines the currently loaded version of WDS_CMB2_Attached_Posts_Field.
+				 */
+				define( 'CMB2_ATTACHED_POSTS_FIELD_VERSION', self::VERSION );
+			}
 
-			// Set our zebra stripes
-			$zebra = $count % 2 == 0 ? 'even' : 'odd';
+			if ( ! defined( 'CMB2_ATTACHED_POSTS_FIELD_DIR' ) ) {
+				/**
+				 * Defines the directory of the currently loaded version of WDS_CMB2_Attached_Posts_Field.
+				 */
+				define( 'CMB2_ATTACHED_POSTS_FIELD_DIR', dirname( __FILE__ ) . '/' );
+			}
 
-			// Set thumbnail if the options is true
-			$thumbnail = $show_thumbnails ? get_the_post_thumbnail( $post_id, array( 50, 50 ) ) : '';
-
-			// Build our list item
-			echo '<li data-id="' . $post_id . '" class="' . $zebra . '">', $thumbnail ,'<a title="'. __( 'Edit' ) .'" href="', get_edit_post_link( $post_id ) ,'">'.  get_the_title( $post_id ) .'</a><span class="dashicons dashicons-minus add-remove"></span></li>';
-
-			$post_ids[] = $post_id;
-
+			// Include and initiate WDS_CMB2_Attached_Posts_Field.
+			require_once CMB2_ATTACHED_POSTS_FIELD_DIR . 'init.php';
 		}
 
-		return $post_ids;
 	}
 
-	public function sanitize( $sanitized_val, $val ) {
-		if ( ! empty( $val ) ) {
-			return explode( ',', $val );
-		}
-		return $sanitized_val;
-	}
-
-	/**
-	 * Enqueue admin scripts for our attached posts field
-	 */
-	protected function setup_admin_scripts() {
-		$dir = trailingslashit( dirname( __FILE__ ) );
-
-		if ( 'WIN' === strtoupper( substr( PHP_OS, 0, 3 ) ) ) {
-			// Windows
-			$content_dir = str_replace( '/', DIRECTORY_SEPARATOR, WP_CONTENT_DIR );
-			$content_url = str_replace( $content_dir, WP_CONTENT_URL, $dir );
-			$url = str_replace( DIRECTORY_SEPARATOR, '/', $content_url );
-
-		} else {
-			$url = str_replace(
-				array( WP_CONTENT_DIR, WP_PLUGIN_DIR ),
-				array( WP_CONTENT_URL, WP_PLUGIN_URL ),
-				$dir
-			);
-		}
-
-		$url = set_url_scheme( $url );
-
-		$requirements = array(
-			'jquery-ui-core',
-			'jquery-ui-widget',
-			'jquery-ui-mouse',
-			'jquery-ui-draggable',
-			'jquery-ui-droppable',
-			'jquery-ui-sortable',
-		);
-
-		wp_enqueue_script( 'cmb2-attached-posts-field', $url . 'js/attached-posts.js', $requirements, self::VERSION, true );
-		wp_enqueue_style( 'cmb2-attached-posts-field', $url . 'css/attached-posts-admin.css', array(), self::VERSION );
-
-	}
+	// Kick it off.
+	new WDS_CMB2_Attached_Posts_Field_123;
 }
-$cmb2_attached_posts_field = new WDS_CMB2_Attached_Posts_Field();
