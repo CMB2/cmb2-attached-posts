@@ -44,7 +44,17 @@ class WDS_CMB2_Attached_Posts_Field {
 		$this->setup_admin_scripts();
 
 		// Setup our args
-		$args = wp_parse_args( (array) $field->options( 'query_args' ), array(
+		$args = (array) $field->options( 'query_args' ); 
+		
+		if ( $field->options( 'exclude_current_post' ) ) {
+			global $post;
+			
+			$args = wp_parse_args( $args, array(
+				'post__not_in' => array( $post->ID ),
+			) );
+		}
+		
+		$args = wp_parse_args( $args, array(
 			'post_type'			=> 'post',
 			'posts_per_page'	=> 100,
 			'orderby'			=> 'name',
