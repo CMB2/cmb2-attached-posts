@@ -150,6 +150,9 @@ if ( ! class_exists( 'WDS_CMB2_Attached_Posts_Field_123', false ) ) {
 
 			// Include and initiate WDS_CMB2_Attached_Posts_Field.
 			require_once CMB2_ATTACHED_POSTS_FIELD_DIR . 'init.php';
+
+			// Include and initiate WDS_CMB2_Attached_Users_Field.
+			require_once CMB2_ATTACHED_POSTS_FIELD_DIR . 'users.php';
 		}
 
 	}
