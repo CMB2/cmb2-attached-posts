@@ -158,7 +158,7 @@ class WDS_CMB2_Attached_Posts_Field {
 				$added = ! empty ( $attached ) && in_array( $user->ID, $attached ) ? ' added' : '';
 
 				// Set thumbnail if the options is true
-				$thumbnail = $has_thumbnail ? get_the_post_thumbnail( $user->ID, array( 50, 50 ) ) : '';
+				$thumbnail = $has_thumbnail ? get_avatar( $user->ID, 25 ) : '';
 
 				// Build our list item
 				echo '<li data-id="', $user->ID ,'" class="' . $zebra . $added . '">', $thumbnail ,'<a title="'. __( 'Edit' ) .'" href="', get_edit_user_link( $user->data->ID ) ,'">', $user->data->display_name,'</a><span class="dashicons dashicons-plus add-remove"></span></li>';
@@ -274,7 +274,7 @@ class WDS_CMB2_Attached_Posts_Field {
 				$zebra = $count % 2 == 0 ? 'even' : 'odd';
 
 				// Set thumbnail if the options is true
-				$thumbnail = $show_thumbnails ? get_avatar( $user_id, 50 ) : '';
+				$thumbnail = $show_thumbnails ? get_avatar( $user_id, 25 ) : '';
 
 				// Build our list item
 				echo '<li data-id="' . $user_id . '" class="' . $zebra . '">', $thumbnail ,'<a title="'. __( 'Edit' ) .'" href="', get_edit_user_link( $user->data->ID ) ,'">'.  $user->data->display_name .'</a><span class="dashicons dashicons-minus add-remove"></span></li>';
