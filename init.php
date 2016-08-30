@@ -43,41 +43,62 @@ class WDS_CMB2_Attached_Posts_Field {
 
 		$this->setup_admin_scripts();
 
-		// Setup our args
-		$args = wp_parse_args( (array) $field->options( 'query_args' ), array(
-			'post_type'			=> 'post',
-			'posts_per_page'	=> 100,
-			'orderby'			=> 'name',
-			'order'				=> 'ASC',
-		) );
+		$query_users = $field->options( 'query_users' );
 
-		// loop through post types to get labels for all
-		$post_type_labels = array();
-		foreach ( (array) $args['post_type'] as $post_type ) {
-			// Get post type object for attached post type
-			$attached_post_type = get_post_type_object( $post_type );
+		if ( ! $query_users ) {
 
-			// continue if we don't have a label for the post type
-			if ( ! $attached_post_type || ! isset( $attached_post_type->labels->name ) ) {
-				continue;
+			// Setup our args
+			$args = wp_parse_args( (array) $field->options( 'query_args' ), array(
+				'post_type'			=> 'post',
+				'posts_per_page'	=> 100,
+				'orderby'			=> 'name',
+				'order'				=> 'ASC',
+			) );
+
+			// loop through post types to get labels for all
+			$post_type_labels = array();
+			foreach ( (array) $args['post_type'] as $post_type ) {
+				// Get post type object for attached post type
+				$attached_post_type = get_post_type_object( $post_type );
+
+				// continue if we don't have a label for the post type
+				if ( ! $attached_post_type || ! isset( $attached_post_type->labels->name ) ) {
+					continue;
+				}
+
+				$post_type_labels[] = $attached_post_type->labels->name;
+				$post_type_labels = implode( '/', $post_type_labels );
 			}
-
-			$post_type_labels[] = $attached_post_type->labels->name;
+		} else {
+			// Setup our args
+			$args = wp_parse_args( (array) $field->options( 'query_args' ), array(
+				'number'  => 100,
+			) );
+			$post_type_labels = 'Users';
 		}
-
-		$post_type_labels = implode( '/', $post_type_labels );
 
 		// Check 'filter' setting
 		$filter_boxes = $field->options( 'filter_boxes' )
 			? '<div class="search-wrap"><input type="text" placeholder="' . sprintf( __( 'Filter %s', 'cmb' ), $post_type_labels ) . '" class="regular-text search" name="%s" /></div>'
 			: '';
 
-		// Get our posts
-		$posts = get_posts( $args );
+		if ( ! $query_users ) {
+			// Get our posts
+			$posts = get_posts( $args );
 
-		// If there are no posts found, just stop
-		if ( ! $posts ) {
-			return;
+			// If there are no posts found, just stop
+			if ( ! $posts ) {
+				return;
+			}
+		} else {
+			// Get our users
+			$users = new WP_User_Query( $args );
+			// var_dump( $users );
+
+			// If there are no posts found, just stop
+			if ( ! $users ) {
+				return;
+			}
 		}
 
 		// Check to see if we have any meta values saved yet
@@ -103,24 +124,46 @@ class WDS_CMB2_Attached_Posts_Field {
 
 		echo '<ul class="retrieved connected' . $has_thumbnail . $hide_selected . '">';
 
-		// Loop through our posts as list items
-		foreach ( $posts as $post ) {
+		if ( ! $query_users ) {
+			// Loop through our posts as list items
+			foreach ( $posts as $post ) {
 
-			// Increase our count
-			$count++;
+				// Increase our count
+				$count++;
 
-			// Set our zebra stripes
-			$zebra = $count % 2 == 0 ? 'even' : 'odd';
+				// Set our zebra stripes
+				$zebra = $count % 2 == 0 ? 'even' : 'odd';
 
-			// Set a class if our post is in our attached post meta
-			$added = ! empty ( $attached ) && in_array( $post->ID, $attached ) ? ' added' : '';
+				// Set a class if our post is in our attached post meta
+				$added = ! empty ( $attached ) && in_array( $post->ID, $attached ) ? ' added' : '';
 
-			// Set thumbnail if the options is true
-			$thumbnail = $has_thumbnail ? get_the_post_thumbnail( $post->ID, array( 50, 50 ) ) : '';
+				// Set thumbnail if the options is true
+				$thumbnail = $has_thumbnail ? get_the_post_thumbnail( $post->ID, array( 50, 50 ) ) : '';
 
-			// Build our list item
-			echo '<li data-id="', $post->ID ,'" class="' . $zebra . $added . '">', $thumbnail ,'<a title="'. __( 'Edit' ) .'" href="', get_edit_post_link( $post ) ,'">', get_the_title( $post ) ,'</a><span class="dashicons dashicons-plus add-remove"></span></li>';
+				// Build our list item
+				echo '<li data-id="', $post->ID ,'" class="' . $zebra . $added . '">', $thumbnail ,'<a title="'. __( 'Edit' ) .'" href="', get_edit_post_link( $post ) ,'">', get_the_title( $post ) ,'</a><span class="dashicons dashicons-plus add-remove"></span></li>';
 
+			}
+		} else {
+			// Loop through our users as list items
+			foreach ( $users->results as $user ) {
+
+				// Increase our count
+				$count++;
+
+				// Set our zebra stripes
+				$zebra = $count % 2 == 0 ? 'even' : 'odd';
+
+				// Set a class if our user is in our attached user meta
+				$added = ! empty ( $attached ) && in_array( $user->ID, $attached ) ? ' added' : '';
+
+				// Set thumbnail if the options is true
+				$thumbnail = $has_thumbnail ? get_the_post_thumbnail( $user->ID, array( 50, 50 ) ) : '';
+
+				// Build our list item
+				echo '<li data-id="', $user->ID ,'" class="' . $zebra . $added . '">', $thumbnail ,'<a title="'. __( 'Edit' ) .'" href="', get_edit_user_link( $user->data->ID ) ,'">', $user->data->display_name,'</a><span class="dashicons dashicons-plus add-remove"></span></li>';
+
+			}
 		}
 
 		// Close our retrieved, or found, posts
@@ -137,11 +180,17 @@ class WDS_CMB2_Attached_Posts_Field {
 
 		echo '<ul class="attached connected', $has_thumbnail ,'">';
 
-		// If we have any posts saved already, display them
-		$post_ids = $this->display_attached( $field, $attached );
+		if ( ! $query_users ) {
+			// If we have any posts saved already, display them
+			$post_ids = $this->display_attached( $field, $attached );
 
-		$value = ! empty( $post_ids ) ? implode( ',', $post_ids ) : '';
+			$value = ! empty( $post_ids ) ? implode( ',', $post_ids ) : '';
+		} else {
+			// If we have any users saved already, display them
+			$user_ids = $this->display_attached( $field, $attached );
 
+			$value = ! empty( $user_ids ) ? implode( ',', $user_ids ) : '';
+		}
 		// Close up shop
 		echo '</ul><!-- #attached -->';
 		echo '</div><!-- .attached-wrap -->';
@@ -173,37 +222,69 @@ class WDS_CMB2_Attached_Posts_Field {
 			return;
 		}
 
+		$query_users = $field->options( 'query_users' );
+
 		// Set our count to zero
 		$count = 0;
 
 		$show_thumbnails = $field->options( 'show_thumbnails' );
 		// Remove any empty values
 		$attached = array_filter( $attached );
-		$post_ids = array();
 
-		// Loop through and build our existing display items
-		foreach ( $attached as $post_id ) {
-			if ( ! get_post( $post_id ) ) {
-				continue;
+		if ( ! $query_users ) {
+			$post_ids = array();
+
+			// Loop through and build our existing display items
+			foreach ( $attached as $post_id ) {
+				if ( ! get_post( $post_id ) ) {
+					continue;
+				}
+
+				// Increase our count
+				$count++;
+
+				// Set our zebra stripes
+				$zebra = $count % 2 == 0 ? 'even' : 'odd';
+
+				// Set thumbnail if the options is true
+				$thumbnail = $show_thumbnails ? get_the_post_thumbnail( $post_id, array( 50, 50 ) ) : '';
+
+				// Build our list item
+				echo '<li data-id="' . $post_id . '" class="' . $zebra . '">', $thumbnail ,'<a title="'. __( 'Edit' ) .'" href="', get_edit_post_link( $post_id ) ,'">'.  get_the_title( $post_id ) .'</a><span class="dashicons dashicons-minus add-remove"></span></li>';
+
+				$post_ids[] = $post_id;
+
 			}
 
-			// Increase our count
-			$count++;
+			return $post_ids;
+		} else {
+			$user_ids = array();
 
-			// Set our zebra stripes
-			$zebra = $count % 2 == 0 ? 'even' : 'odd';
+			// Loop through and build our existing display items
+			foreach ( $attached as $user_id ) {
+				$user = get_user_by( 'id', $user_id );
+				if ( ! $user ) {
+					continue;
+				}
 
-			// Set thumbnail if the options is true
-			$thumbnail = $show_thumbnails ? get_the_post_thumbnail( $post_id, array( 50, 50 ) ) : '';
+				// Increase our count
+				$count++;
 
-			// Build our list item
-			echo '<li data-id="' . $post_id . '" class="' . $zebra . '">', $thumbnail ,'<a title="'. __( 'Edit' ) .'" href="', get_edit_post_link( $post_id ) ,'">'.  get_the_title( $post_id ) .'</a><span class="dashicons dashicons-minus add-remove"></span></li>';
+				// Set our zebra stripes
+				$zebra = $count % 2 == 0 ? 'even' : 'odd';
 
-			$post_ids[] = $post_id;
+				// Set thumbnail if the options is true
+				$thumbnail = $show_thumbnails ? get_avatar( $user_id, 50 ) : '';
 
+				// Build our list item
+				echo '<li data-id="' . $user_id . '" class="' . $zebra . '">', $thumbnail ,'<a title="'. __( 'Edit' ) .'" href="', get_edit_user_link( $user->data->ID ) ,'">'.  $user->data->display_name .'</a><span class="dashicons dashicons-minus add-remove"></span></li>';
+
+				$user_ids[] = $user_id;
+
+			}
+
+			return $user_ids;
 		}
-
-		return $post_ids;
 	}
 
 	public function sanitize( $sanitized_val, $val ) {
