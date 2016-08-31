@@ -3,7 +3,7 @@
  * Plugin Name: CMB2 Field Type: Attached Posts
  * Plugin URI: https://github.com/WebDevStudios/cmb2-attached-posts
  * Description: Attached posts field type for CMB2.
- * Version: 1.2.3
+ * Version: 1.2.4
  * Author: WebDevStudios
  * Author URI: http://webdevstudios.com
  * License: GPLv2+
@@ -19,7 +19,7 @@
  * @author    WebDevStudios <contact@webdevstudios.com>
  * @copyright 2016 WebDevStudios <contact@webdevstudios.com>
  * @license   GPL-2.0+
- * @version   1.2.3
+ * @version   1.2.4
  * @link      https://github.com/WebDevStudios/cmb2-attached-posts
  * @since     1.2.3
  */
@@ -46,7 +46,7 @@
  * Loader versioning: http://jtsternberg.github.io/wp-lib-loader/
  */
 
-if ( ! class_exists( 'WDS_CMB2_Attached_Posts_Field_123', false ) ) {
+if ( ! class_exists( 'WDS_CMB2_Attached_Posts_Field_124', false ) ) {
 
 	/**
 	 * Versioned loader class-name
@@ -57,18 +57,18 @@ if ( ! class_exists( 'WDS_CMB2_Attached_Posts_Field_123', false ) ) {
 	 * @package  WDS_CMB2_Attached_Posts_Field
 	 * @author   WebDevStudios <contact@webdevstudios.com>
 	 * @license  GPL-2.0+
-	 * @version  1.2.3
+	 * @version  1.2.4
 	 * @link     https://github.com/WebDevStudios/cmb2-attached-posts
 	 * @since    1.2.3
 	 */
-	class WDS_CMB2_Attached_Posts_Field_123 {
+	class WDS_CMB2_Attached_Posts_Field_124 {
 
 		/**
 		 * WDS_CMB2_Attached_Posts_Field version number
 		 * @var   string
 		 * @since 1.2.3
 		 */
-		const VERSION = '1.2.3';
+		const VERSION = '1.2.4';
 
 		/**
 		 * Current version hook priority.
@@ -77,7 +77,7 @@ if ( ! class_exists( 'WDS_CMB2_Attached_Posts_Field_123', false ) ) {
 		 * @var   int
 		 * @since 1.2.3
 		 */
-		const PRIORITY = 9999;
+		const PRIORITY = 9998;
 
 		/**
 		 * Starts the version checking process.
@@ -155,5 +155,5 @@ if ( ! class_exists( 'WDS_CMB2_Attached_Posts_Field_123', false ) ) {
 	}
 
 	// Kick it off.
-	new WDS_CMB2_Attached_Posts_Field_123;
+	new WDS_CMB2_Attached_Posts_Field_124;
 }
