@@ -44,3 +44,12 @@ Once you have the post data for the post ID, you can proceed with the desired fu
 
 ### 1.2.3
 * Add loader to manage loading the most recent version of this lib.
+
+### 1.2.2
+* Allow array of post-types. Props [@mmcachran](https://github.com/mmcachran).
+
+### 1.2.1
+* Add Search Filter Boxes to Lists. Props [@owenconti](https://github.com/owenconti).
+
+### 1.2.0
+* Add plugin support. Props [@yelly](https://github.com/yelly).
