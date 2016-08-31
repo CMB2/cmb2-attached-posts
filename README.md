@@ -36,3 +36,11 @@ Once you have the post data for the post ID, you can proceed with the desired fu
 
 1. Field display  
 ![Field display](https://raw.githubusercontent.com/WebDevStudios/cmb2-attached-posts/master/attached-posts-field.png)`
+
+## Changelog
+
+### 1.2.4
+* Add support for attaching Users instead of Posts/Custom Posts. Props [mckernanin](https://github.com/mckernanin) ([#27](https://github.com/WebDevStudios/cmb2-attached-posts/pull/27)).
+
+### 1.2.3
+* Add loader to manage loading the most recent version of this lib.
