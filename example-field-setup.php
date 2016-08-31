@@ -35,7 +35,19 @@ function cmb2_attached_posts_field_metaboxes_example() {
 			'show_thumbnails' => true, // Show thumbnails on the left
 			'filter_boxes'    => true, // Show a text box for filtering the results
 			'query_args'      => array( 'posts_per_page' => 10 ), // override the get_posts args
-		)
+		),
+	) );
+
+	$example_meta->add_field( array(
+		'name'    => __( 'Attached Users', 'cmb2' ),
+		'desc'    => __( 'Drag users from the left column to the right column to attach them to this page.<br />You may rearrange the order of the users in the right column by dragging and dropping.', 'cmb2' ),
+		'id'      => 'attached_cmb2_attached_users',
+		'type'    => 'custom_attached_posts',
+		'options' => array(
+			'show_thumbnails' => true, // Show thumbnails on the left
+			'filter_boxes'    => true, // Show a text box for filtering the results
+			'query_users'     => true,
+		),
 	) );
 
 }
