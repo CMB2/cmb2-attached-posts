@@ -67,8 +67,9 @@ class WDS_CMB2_Attached_Posts_Field {
 				}
 
 				$post_type_labels[] = $attached_post_type->labels->name;
-				$post_type_labels = implode( '/', $post_type_labels );
 			}
+			$post_type_labels = implode( '/', $post_type_labels );
+			
 		} else {
 			// Setup our args
 			$args = wp_parse_args( (array) $field->options( 'query_args' ), array(
