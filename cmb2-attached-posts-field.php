@@ -46,7 +46,7 @@
  * Loader versioning: http://jtsternberg.github.io/wp-lib-loader/
  */
 
-if ( ! class_exists( 'WDS_CMB2_Attached_Posts_Field_124', false ) ) {
+if ( ! class_exists( 'WDS_CMB2_Attached_Posts_Field_125', false ) ) {
 
 	/**
 	 * Versioned loader class-name
@@ -61,14 +61,20 @@ if ( ! class_exists( 'WDS_CMB2_Attached_Posts_Field_124', false ) ) {
 	 * @link     https://github.com/WebDevStudios/cmb2-attached-posts
 	 * @since    1.2.3
 	 */
-	class WDS_CMB2_Attached_Posts_Field_124 {
+	class WDS_CMB2_Attached_Posts_Field_125 {
+
+		/**
+		 * Instance of WDS_CMB2_Attached_Posts_Field_125
+		 * @var WDS_CMB2_Attached_Posts_Field_125
+		 */
+		public static $instance = null;
 
 		/**
 		 * WDS_CMB2_Attached_Posts_Field version number
 		 * @var   string
 		 * @since 1.2.3
 		 */
-		const VERSION = '1.2.4';
+		const VERSION = '1.2.5';
 
 		/**
 		 * Current version hook priority.
@@ -79,18 +85,15 @@ if ( ! class_exists( 'WDS_CMB2_Attached_Posts_Field_124', false ) ) {
 		 */
 		const PRIORITY = 9998;
 
-		/**
-		 * Starts the version checking process.
-		 * Creates CMB2_ATTACHED_POSTS_FIELD_LOADED definition for early detection by
-		 * other scripts.
-		 *
-		 * Hooks WDS_CMB2_Attached_Posts_Field inclusion to the cmb2_attached_posts_field_load hook
-		 * on a high priority which decrements (increasing the priority) with
-		 * each version release.
-		 *
-		 * @since 1.2.3
-		 */
-		public function __construct() {
+		public static function init() {
+			if ( null == self::$instance ) {
+				self::$instance = new self();
+			}
+
+			return self::$instance;
+		}
+
+		private function __construct() {
 			if ( ! defined( 'CMB2_ATTACHED_POSTS_FIELD_LOADED' ) ) {
 				/**
 				 * A constant you can use to check if WDS_CMB2_Attached_Posts_Field is loaded
@@ -102,34 +105,10 @@ if ( ! class_exists( 'WDS_CMB2_Attached_Posts_Field_124', false ) ) {
 				define( 'CMB2_ATTACHED_POSTS_FIELD_LOADED', self::PRIORITY );
 			}
 
-			// Use the hook system to ensure only the newest version is loaded.
-			add_action( 'cmb2_attached_posts_field_load', array( $this, 'include_lib' ), self::PRIORITY );
-
-			// Use the hook system to ensure only the newest version is loaded.
-			add_action( 'after_setup_theme', array( $this, 'do_hook' ) );
+			add_action( 'cmb2_init', array( $this, 'include_attached_posts' ) );
 		}
 
-		/**
-		 * Fires the cmb2_attached_posts_field_load action hook
-		 * (from the after_setup_theme hook).
-		 *
-		 * @since 1.2.3
-		 */
-		public function do_hook() {
-			// Then fire our hook.
-			do_action( 'cmb2_attached_posts_field_load' );
-		}
-
-		/**
-		 * A final check if WDS_CMB2_Attached_Posts_Field exists before kicking off
-		 * our WDS_CMB2_Attached_Posts_Field loading.
-		 *
-		 * CMB2_ATTACHED_POSTS_FIELD_VERSION and CMB2_ATTACHED_POSTS_FIELD_DIR constants are
-		 * set at this point.
-		 *
-		 * @since  1.2.3
-		 */
-		public function include_lib() {
+		public function include_attached_posts() {
 			if ( class_exists( 'WDS_CMB2_Attached_Posts_Field', false ) ) {
 				return;
 			}
@@ -151,9 +130,8 @@ if ( ! class_exists( 'WDS_CMB2_Attached_Posts_Field_124', false ) ) {
 			// Include and initiate WDS_CMB2_Attached_Posts_Field.
 			require_once CMB2_ATTACHED_POSTS_FIELD_DIR . 'init.php';
 		}
-
 	}
 
-	// Kick it off.
-	new WDS_CMB2_Attached_Posts_Field_124;
+	// Load similarly to CMB2
+	WDS_CMB2_Attached_Posts_Field_125::init();
 }
