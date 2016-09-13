@@ -39,6 +39,9 @@ Once you have the post data for the post ID, you can proceed with the desired fu
 
 ## Changelog
 
+### 1.2.5
+* Update to allow usage on options pages. Props [JayWood](https://github.com/jaywood/)
+
 ### 1.2.4
 * Add support for attaching Users instead of Posts/Custom Posts. Props [mckernanin](https://github.com/mckernanin) ([#27](https://github.com/WebDevStudios/cmb2-attached-posts/pull/27)).
 
