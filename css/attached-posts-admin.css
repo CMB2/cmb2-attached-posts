@@ -101,3 +101,8 @@
 ul.hide-selected li.added{
     display: none;
 }
+
+.cmb2-attached-posts-search-button span {
+	color: #999;
+	margin: .2em -.2em 0 1px;
+}

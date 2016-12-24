@@ -1,28 +1,50 @@
 /**
  * Add the drag and drop and sort functionality to the Tiered Template admin
  */
-window.CMBAP = window.CMBAP || (function(window, document, $, undefined) {
+window.CMBAP = window.CMBAP || {};
 
-	var app = { $ : {} };
+( function( window, document, $, app, undefined ) {
+
+	app.$ = {};
 
 	app.cache = function() {
-		var $wrap                = $( '.attached-posts-wrap' );
-		app.$.retrievedPosts     = $wrap.find( '.retrieved' );
-		app.$.attachedPosts      = $wrap.find( '.attached' );
+		var $wrap            = $( '.attached-posts-wrap' );
+		app.$.retrievedPosts = $wrap.find( '.retrieved' );
+		app.$.attachedPosts  = $wrap.find( '.attached' );
 	};
 
 	app.init = function() {
 		app.cache();
 
 		// Allow the user to drag items from the left list
-		app.$.retrievedPosts.find( 'li' ).draggable({
+		app.makeDraggable();
+
+		// Allow the right list to be droppable and sortable
+		app.makeDroppable();
+
+		$( '.cmb2-wrap > .cmb2-metabox' )
+			// Add posts when the plus icon is clicked
+			.on( 'click', '.attached-posts-wrap .retrieved .add-remove', app._moveRowToAttached )
+			// Remove posts when the minus icon is clicked
+			.on( 'click', '.attached-posts-wrap .attached .add-remove', app._removeRowFromAttached )
+			// Listen for search events
+			.on( 'keyup', '.attached-posts-wrap input.search', app._handleFilter )
+			.on( 'click', '.cmb-type-custom-attached-posts .cmb-td .cmb2-attached-posts-search-button', app._openSearch );
+
+		$( document.body ).on( 'click', '.ui-find-overlay', app.closeSearch );
+	};
+
+	app.makeDraggable = function() {
+		// Allow the user to drag items from the left list
+		app.$retrievedPosts().draggable({
 			helper: 'clone',
 			revert: 'invalid',
 			stack: '.retrieved li',
 			stop: app.replacePlusIcon,
 		});
+	};
 
-		// Allow the right list to be droppable and sortable
+	app.makeDroppable = function() {
 		app.$.attachedPosts.droppable({
 			accept: '.retrieved li',
 			drop: function(evt, ui) {
@@ -33,20 +55,10 @@ window.CMBAP = window.CMBAP || (function(window, document, $, undefined) {
 				app.resetItems( ui.item );
 			}
 		}).disableSelection();
-
-		$( '.cmb2-wrap > .cmb2-metabox' )
-			// Add posts when the plus icon is clicked
-			.on( 'click', '.attached-posts-wrap .retrieved .add-remove', app.addPostToColumn )
-			// Remove posts when the minus icon is clicked
-			.on( 'click', '.attached-posts-wrap .attached .add-remove', app.removePostFromColumn )
-			// Listen for search events
-			.on( 'keyup', '.attached-posts-wrap input.search', app.handleSearch );
-
 	};
 
 	// Clone our dragged item
 	app.buildItems = function( item ) {
-
 		var $wrap  = $( item ).parents( '.attached-posts-wrap' );
 		// Get the ID of the item being dragged
 		var itemID = item[0].attributes[0].value;
@@ -65,9 +77,12 @@ window.CMBAP = window.CMBAP || (function(window, document, $, undefined) {
 	};
 
 	// Add the items when the plus icon is clicked
-	app.addPostToColumn = function() {
+	app._moveRowToAttached = function() {
+		app.moveRowToAttached( $( this ).parent() );
+	};
 
-		var $li    = $( this ).parent();
+	// Move Post to Attached column.
+	app.moveRowToAttached = function( $li ) {
 		var itemID = $li.data( 'id' );
 		var $wrap  = $li.parents( '.attached-posts-wrap' );
 
@@ -90,15 +105,18 @@ window.CMBAP = window.CMBAP || (function(window, document, $, undefined) {
 	};
 
 	// Remove items from our attached list when the minus icon is clicked
-	app.removePostFromColumn = function() {
-
+	app._removeRowFromAttached = function() {
 		// Get the clicked item's ID
-		var $li    = $(this).closest( 'li' );
+		app.removeRowFromAttached( $(this).closest( 'li' ) );
+	};
+
+	// Remove items from our attached list when the minus icon is clicked
+	app.removeRowFromAttached = function( $li ) {
 		var itemID = $li.data( 'id' );
 		var $wrap  = $li.parents( '.attached-posts-wrap' );
 
 		// Remove the list item
-		$(this).parent().remove();
+		$li.remove();
 
 		// Remove the 'added' class from the retrieved column
 		$wrap.find('.retrieved li[data-id="' + itemID +'"]').removeClass('added');
@@ -150,25 +168,225 @@ window.CMBAP = window.CMBAP || (function(window, document, $, undefined) {
 	};
 
 	// Handle searching available list
-	app.handleSearch = function( evt ) {
-
+	app._handleFilter = function( evt ) {
 		var $this = $( evt.target );
-		var searchQuery = $this.val() ? $this.val().toLowerCase() : '';
+		app.handleFilter( $this.val() || '', $this.closest( '.column-wrap' ) );
+	};
 
-		$this.closest( '.column-wrap' ).find( 'ul.connected li' ).each( function() {
+	// Handle searching available list
+	app.handleFilter = function( term, $column ) {
+		term = term ? term.toLowerCase() : '';
+
+		$column.find( 'ul.connected li' ).each( function() {
 			var $el = $(this);
 
-			if ( $el.text().toLowerCase().search( searchQuery ) > -1 ) {
+			if ( $el.text().toLowerCase().search( term ) > -1 ) {
 				$el.show();
 			} else {
 				$el.hide();
 			}
 		} );
-
 	};
 
-	jQuery(document).ready( app.init );
+	app.rowTmpl = function( row ) {
+		return '<li data-id="'+ row.id +'" class="'+ row.class +' ui-draggable ui-draggable-handle"><a title="'+ app.editTitle +'" href="'+ app.edit_link_template.replace( 'REPLACEME', row.id ) +'">'+ row.title +'</a><span class="dashicons dashicons-plus add-remove"></span></li>';
+	};
 
-	return app;
+	app.$retrievedPosts = function() {
+		return app.$.retrievedPosts.find( 'li' );
+	};
 
-})(window, document, jQuery);
+	app.$lastRow = function() {
+		var $lastRow = app.$retrievedPosts().last();
+
+		if ( ! app.editTitle ) {
+			app.editTitle = $lastRow.find( 'a' ).attr( 'title' );
+		}
+
+		return $lastRow;
+	};
+
+	app.SearchView = window.Backbone.View.extend({
+		el         : '#find-posts',
+		overlaySet : false,
+		$overlay   : false,
+		$button    : false,
+
+		events : {
+			'keypress .find-box-search:input' : 'maybeStartSearch',
+			'keyup #find-posts-input'  : 'escClose',
+			'click #find-posts-submit' : 'selectPost',
+			'click #find-posts-search' : 'send',
+			'click #find-posts-close'  : 'close',
+		},
+
+		initialize: function() {
+			this.$spinner  = this.$el.find( '.find-box-search .spinner' );
+			this.$input    = this.$el.find( '#find-posts-input' );
+			this.$response = this.$el.find( '#find-posts-response' );
+			this.$overlay  = $( '.ui-find-overlay' );
+
+			this.listenTo( this, 'open', this.open );
+			this.listenTo( this, 'close', this.close );
+		},
+
+		escClose: function( evt ) {
+			if ( evt.which && 27 === evt.which ) {
+				this.close();
+			}
+		},
+
+		close: function() {
+			this.$overlay.hide();
+			this.$el.hide();
+		},
+
+		open: function() {
+			this.$response.html('');
+
+			// WP, why you so dumb? (why isn't text in its own dom node?)
+			this.$el.show().find( '#find-posts-head' ).html( this.findtxt + '<div id="find-posts-close"></div>' );
+
+			this.$input.focus();
+
+			if ( ! this.$overlay.length ) {
+				$( 'body' ).append( '<div class="ui-find-overlay"></div>' );
+				this.$overlay  = $( '.ui-find-overlay' );
+			}
+
+			this.$overlay.show();
+
+			// Pull some results up by default
+			this.send();
+
+			return false;
+		},
+
+		maybeStartSearch: function( evt ) {
+			if ( 13 == evt.which ) {
+				this.send();
+				return false;
+			}
+		},
+
+		send: function() {
+			this.$spinner.addClass( 'is-active' );
+
+			var retrieved = app.$retrievedPosts().map( function() {
+				return $( this ).data( 'id' );
+			} ).get();
+
+			var data = {
+				ps                   : this.$input.val(),
+				action               : 'find_posts',
+				query_users          : this.queryUsers ? 1 : 0,
+				search_types         : this.types,
+				cmb_id               : this.cmbId,
+				group_id             : this.groupId,
+				field_id             : this.fieldId,
+				exclude              : this.exclude,
+				retrieved            : retrieved,
+				_ajax_nonce          : $( '#find-posts #_ajax_nonce' ).val(),
+				cmb2_attached_search : true,
+			};
+
+			$.post( app.ajaxurl, data )
+				.always( this.hideSpinner.bind( this ) )
+				.done( this.ajaxSuccess.bind( this ) )
+				.fail( this.ajaxFail.bind( this ) );
+		},
+
+		hideSpinner: function() {
+			console.warn('hideSpinner');
+			this.$spinner.removeClass( 'is-active' );
+		},
+
+		ajaxSuccess: function( response ) {
+			console.warn('ajaxSuccess');
+			if ( ! response.success ) {
+				this.$response.text( this.errortxt );
+			}
+
+			var data = response.data.replace( /type="radio"/gi, 'type="checkbox"' );
+
+			this.$response.html( data );
+		},
+
+		ajaxFail: function( response ) {
+			console.warn('ajaxFail');
+			this.$response.text( this.errortxt );
+		},
+
+		selectPost: function( evt ) {
+			evt.preventDefault();
+
+			var html = '';
+			// var posts = [];
+			var $checked = this.$response.find( 'input[type="checkbox"]:checked' );
+
+			if ( ! $checked.length ) {
+				this.close();
+				return;
+			}
+
+			var $lastRow = app.$lastRow();
+			var nextClass = $lastRow.hasClass( 'even' ) ? 'odd' : 'even';
+			var ids = [];
+
+			$checked.each( function() {
+				ids.push( this.value );
+
+				html += app.rowTmpl( {
+					title : $( this ).parents( '.found-posts' ).find( 'label' ).html(),
+					id    : this.value,
+					class : nextClass
+				} );
+
+				nextClass = 'even' === nextClass ? 'odd' : 'even';
+			} );
+
+			if ( html ) {
+				$lastRow.after( html );
+				app.makeDraggable();
+
+				this.moveInserted( ids );
+			}
+
+			this.close();
+		},
+
+		moveInserted: function( ids ) {
+			// This delay is only for dramatic effect,
+			// as otherwise it appears nothing happened.
+			setTimeout( function() {
+				for ( var i = 0; i <= ids.length; i++ ) {
+					app.moveRowToAttached( app.$retrievedPosts().filter( '[data-id="'+ ids[i] +'"]' ) );
+				}
+			}, 500 );
+		},
+
+
+	});
+
+	app.search = new app.SearchView();
+
+	app.closeSearch = function() {
+		app.search.trigger( 'close' );
+	};
+
+	app._openSearch = function( evt ) {
+		app.openSearch( $( evt.currentTarget ) );
+	};
+
+	app.openSearch = function( $button ) {
+		app.search.$button = $button;
+
+		// Setup our variables from the field data
+		$.extend( app.search, app.search.$button.data( 'search' ) );
+
+		app.search.trigger( 'open' );
+	};
+
+	$( app.init );
+
+} )( window, document, jQuery, window.CMBAP );

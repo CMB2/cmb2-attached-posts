@@ -37,7 +37,13 @@ Once you have the post data for the post ID, you can proceed with the desired fu
 1. Field display  
 ![Field display](https://raw.githubusercontent.com/WebDevStudios/cmb2-attached-posts/master/attached-posts-field.png)`
 
+1. Post search  
+![Post search](https://raw.githubusercontent.com/WebDevStudios/cmb2-attached-posts/master/attached-posts-search.gif)`
+
 ## Changelog
+
+### 1.2.5
+* Combined the best bits from the [CMB2 Post Search field](https://github.com/WebDevStudios/CMB2-Post-Search-field) type and this field type, so now you can search for additional posts/pages/etc to be attached. User search is not currently supported. ([#7](https://github.com/WebDevStudios/cmb2-attached-posts/pull/7)).
 
 ### 1.2.4
 * Add support for attaching Users instead of Posts/Custom Posts. Props [mckernanin](https://github.com/mckernanin) ([#27](https://github.com/WebDevStudios/cmb2-attached-posts/pull/27)).

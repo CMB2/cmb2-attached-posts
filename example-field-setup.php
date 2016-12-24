@@ -34,7 +34,10 @@ function cmb2_attached_posts_field_metaboxes_example() {
 		'options' => array(
 			'show_thumbnails' => true, // Show thumbnails on the left
 			'filter_boxes'    => true, // Show a text box for filtering the results
-			'query_args'      => array( 'posts_per_page' => 10 ), // override the get_posts args
+			'query_args'      => array(
+				'posts_per_page' => 10,
+				'post_type'      => 'page',
+			), // override the get_posts args
 		),
 	) );
 
