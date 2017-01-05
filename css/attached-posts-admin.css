@@ -39,10 +39,15 @@
 }
 
 .cmb-type-custom-attached-posts .has-thumbnails.connected {
-	height: 600px;
+	height: 30em;
 }
 
 .cmb-type-custom-attached-posts .has-thumbnails li {
+	clear: both;
+}
+.cmb-type-custom-attached-posts .has-thumbnails li::after {
+	content: ' ';
+	display: block;
 	clear: both;
 }
 
