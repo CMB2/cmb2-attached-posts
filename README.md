@@ -3,9 +3,7 @@ CMB2 Attached Posts Field
 
 Custom field for [CMB2](https://github.com/WebDevStudios/CMB2).
 
-The post IDs are saved in an array, which can be rearranged by dragging and dropping posts in the attached posts column.
-
-If the ability to search for a post and attach it is more in line with what you need, you might consider [CMB2 Post Search field](https://github.com/WebDevStudios/CMB2-Post-Search-field) instead.
+The post IDs are saved in an array, which can be rearranged by dragging and dropping posts in the attached posts column. Now incorporates the same search field as the [CMB2 Post Search field](https://github.com/WebDevStudios/CMB2-Post-Search-field).
 
 ## Installation
 
