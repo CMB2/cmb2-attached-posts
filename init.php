@@ -22,6 +22,14 @@ class WDS_CMB2_Attached_Posts_Field {
 	protected $field;
 
 	/**
+	 * Whether to output the type label.
+	 * Determined when multiple post types exist in the query_args field arg.
+	 *
+	 * @var bool
+	 */
+	protected $do_type_label = false;
+
+	/**
 	 * Creates or returns an instance of this class.
 	 * @since  0.1.0
 	 * @return WDS_CMB2_Attached_Posts_Field A single instance of this class.
@@ -51,6 +59,7 @@ class WDS_CMB2_Attached_Posts_Field {
 	public function render( $field, $escaped_value, $object_id, $object_type, $field_type ) {
 		self::setup_scripts();
 		$this->field = $field;
+		$this->do_type_label = false;
 
 		if ( ! is_admin() ) {
 			// Will need custom styling!
@@ -95,6 +104,9 @@ class WDS_CMB2_Attached_Posts_Field {
 
 				$post_type_labels[] = $post_type_obj->labels->name;
 			}
+
+			$this->do_type_label = count( $post_type_labels ) > 1;
+
 			$post_type_labels = implode( '/', $post_type_labels );
 
 		} else {
@@ -274,12 +286,13 @@ class WDS_CMB2_Attached_Posts_Field {
 	public function list_item( $object, $li_class, $icon_class = 'dashicons-plus' ) {
 		// Build our list item
 		printf(
-			'<li data-id="%1$d" class="%2$s">%3$s<a title="' . __( 'Edit' ) . '" href="%4$s">%5$s</a><span class="dashicons %6$s add-remove"></span></li>',
+			'<li data-id="%1$d" class="%2$s">%3$s<a title="' . __( 'Edit' ) . '" href="%4$s">%5$s</a>%6$s<span class="dashicons %7$s add-remove"></span></li>',
 			$this->get_id( $object ),
 			$li_class,
 			$this->get_thumb( $object ),
 			$this->get_edit_link( $object ),
 			$this->get_title( $object ),
+			$this->get_object_label( $object ),
 			$icon_class
 		);
 	}
@@ -332,6 +345,26 @@ class WDS_CMB2_Attached_Posts_Field {
 		return $this->field->options( 'query_users' )
 			? $object->data->display_name
 			: get_the_title( $object );
+	}
+
+	/**
+	 * Get object label.
+	 *
+	 * @since  1.2.6
+	 *
+	 * @param  mixed  $object Post or User
+	 *
+	 * @return string         The object label.
+	 */
+	public function get_object_label( $object ) {
+		if ( ! $this->do_type_label ) {
+			return '';
+		}
+
+		$post_type_obj = get_post_type_object( $object->post_type );
+		$label = isset( $post_type_obj->labels->singular_name ) ? $post_type_obj->labels->singular_name : $post_type_obj->label;
+
+		return ' &mdash; <span class="object-label">'. $label .'</span>';
 	}
 
 	/**
