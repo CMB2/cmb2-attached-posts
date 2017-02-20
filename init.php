@@ -286,7 +286,7 @@ class WDS_CMB2_Attached_Posts_Field {
 	public function list_item( $object, $li_class, $icon_class = 'dashicons-plus' ) {
 		// Build our list item
 		printf(
-			'<li data-id="%1$d" class="%2$s">%3$s<a title="' . __( 'Edit' ) . '" href="%4$s">%5$s</a>%6$s<span class="dashicons %7$s add-remove"></span></li>',
+			'<li data-id="%1$d" class="%2$s" target="_blank">%3$s<a title="' . __( 'Edit' ) . '" href="%4$s">%5$s</a>%6$s<span class="dashicons %7$s add-remove"></span></li>',
 			$this->get_id( $object ),
 			$li_class,
 			$this->get_thumb( $object ),
