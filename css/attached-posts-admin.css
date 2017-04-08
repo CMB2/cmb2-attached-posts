@@ -111,3 +111,8 @@ ul.hide-selected li.added{
 	color: #999;
 	margin: .2em -.2em 0 1px;
 }
+
+.attached-wrap .attached.connected li input{ 
+	display: block;
+	width: 60%;
+}

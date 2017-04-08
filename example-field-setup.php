@@ -33,6 +33,7 @@ function cmb2_attached_posts_field_metaboxes_example() {
 		'type'    => 'custom_attached_posts',
 		'options' => array(
 			'show_thumbnails' => true, // Show thumbnails on the left
+			//'show_relation'    => true, // Show a text box for attached post relationship
 			'filter_boxes'    => true, // Show a text box for filtering the results
 			'query_args'      => array(
 				'posts_per_page' => 10,
