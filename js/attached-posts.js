@@ -86,6 +86,7 @@ window.CMBAP = window.CMBAP || {};
 	app.moveRowToAttached = function( $li ) {
 		var itemID = $li.data( 'id' );
 		var $wrap  = $li.parents( '.attached-posts-wrap' );
+		var fieldname = $wrap.data( 'fieldname' );
 
 		if ( $li.hasClass( 'added' ) ) {
 			return;
@@ -100,8 +101,13 @@ window.CMBAP = window.CMBAP || {};
 		$li.addClass( 'added' );
 
 		// Add the item to the right list
-		$wrap.find( '.attached' ).append( $li.clone() );
-
+		$wrap.find( '.attached' ).append( function(){
+			return $( this ).closest( 'ul' ).hasClass( 'has-relation' ) ? $li.clone().append( $( '<input>' ).attr({
+				type: "text",
+				name: fieldname + '_relation['+ itemID + ']',
+				class: fieldname + '_relation"'
+				}) ) : $li.clone();
+		});
 		app.resetAttachedListItems( $wrap );
 	};
 

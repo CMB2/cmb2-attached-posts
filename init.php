@@ -10,7 +10,7 @@ class WDS_CMB2_Attached_Posts_Field {
 	const VERSION = CMB2_ATTACHED_POSTS_FIELD_VERSION;
 
 	/**
-	 * @var WDS_CMB2_Attached_Posts_Field
+	 * @var WDS_CMB2_Attached_Posts_Field 
 	 */
 	protected static $single_instance = null;
 
@@ -30,6 +30,14 @@ class WDS_CMB2_Attached_Posts_Field {
 	protected $do_type_label = false;
 
 	/**
+	 * If show_relation option active relationship meta key and meta key suffic
+	 *
+	 * @var string
+	 */
+	protected $relation_key;
+	protected $meta_key_suffix = '_relation';
+	
+	/**
 	 * Creates or returns an instance of this class.
 	 * @since  0.1.0
 	 * @return WDS_CMB2_Attached_Posts_Field A single instance of this class.
@@ -47,6 +55,7 @@ class WDS_CMB2_Attached_Posts_Field {
 	 */
 	protected function __construct() {
 		add_action( 'cmb2_render_custom_attached_posts', array( $this, 'render' ), 10, 5 );
+		add_action( 'cmb2_save_field', array( $this, 'attached_posts_relation_meta' ), 10, 4 );
 		add_action( 'cmb2_sanitize_custom_attached_posts', array( $this, 'sanitize' ), 10, 2 );
 		add_action( 'cmb2_attached_posts_field_add_find_posts_div', array( $this, 'add_find_posts_div' ) );
 		add_action( 'cmb2_after_init', array( $this, 'ajax_find_posts' ) );
@@ -143,12 +152,13 @@ class WDS_CMB2_Attached_Posts_Field {
 		// Set .has_thumbnail
 		$has_thumbnail = $this->field->options( 'show_thumbnails' ) ? ' has-thumbnails' : '';
 		$hide_selected = $this->field->options( 'hide_selected' ) ? ' hide-selected' : '';
+		$has_relation = $this->field->options( 'show_relation' ) ? ' has-relation' : '';
 
 		if ( $filter_boxes ) {
 			printf( $filter_boxes, 'available-search' );
 		}
 
-		echo '<ul class="retrieved connected' . $has_thumbnail . $hide_selected . '">';
+		echo '<ul class="retrieved connected' . $has_thumbnail . $hide_selected . $has_relation . '">';
 
 		// Loop through our posts as list items
 		$this->display_retrieved( $objects, $attached );
@@ -184,7 +194,7 @@ class WDS_CMB2_Attached_Posts_Field {
 			printf( $filter_boxes, 'attached-search' );
 		}
 
-		echo '<ul class="attached connected', $has_thumbnail ,'">';
+		echo '<ul class="attached connected', $has_thumbnail . $has_relation ,'">';
 
 		// If we have any ids saved already, display them
 		$ids = $this->display_attached( $attached );
@@ -261,11 +271,11 @@ class WDS_CMB2_Attached_Posts_Field {
 			if ( empty( $object ) ) {
 				continue;
 			}
-
+			$input = $this->get_object_input( $object, $id );
 			// Set our zebra stripes
 			$class = ++$count % 2 == 0 ? 'even' : 'odd';
 
-			$this->list_item( $object, $class, 'dashicons-minus' );
+			$this->list_item( $object, $class, 'dashicons-minus', $input );
 			$ids[ $id ] = $id;
 		}
 
@@ -283,17 +293,18 @@ class WDS_CMB2_Attached_Posts_Field {
 	 *
 	 * @return void
 	 */
-	public function list_item( $object, $li_class, $icon_class = 'dashicons-plus' ) {
+	public function list_item( $object, $li_class, $icon_class = 'dashicons-plus', $input = '' ) {
 		// Build our list item
 		printf(
-			'<li data-id="%1$d" class="%2$s" target="_blank">%3$s<a title="' . __( 'Edit' ) . '" href="%4$s">%5$s</a>%6$s<span class="dashicons %7$s add-remove"></span></li>',
+			'<li data-id="%1$d" class="%2$s" target="_blank">%3$s<a title="' . __( 'Edit' ) . '" href="%4$s">%5$s</a>%6$s<span class="dashicons %7$s add-remove"></span>%8$s</li>',
 			$this->get_id( $object ),
 			$li_class,
 			$this->get_thumb( $object ),
 			$this->get_edit_link( $object ),
 			$this->get_title( $object ),
 			$this->get_object_label( $object ),
-			$icon_class
+			$icon_class,
+			$input
 		);
 	}
 
@@ -330,6 +341,27 @@ class WDS_CMB2_Attached_Posts_Field {
 	 */
 	public function get_id( $object ) {
 		return $object->ID;
+	}
+
+	/**
+	 * Get input for the object.
+	 *
+	 * @since  1.2.4
+	 *
+	 * @param  mixed  $object Post or User
+	 *
+	 * @return string         The object edit link.
+	 */
+	public function get_object_input( $object, $id ) {
+		if ( $this->field->options( 'show_relation' ) ) {
+			$this->relation_key = $this->field->args['id'] . $this->meta_key_suffix;
+			$value = get_post_meta( get_the_ID(), $this->relation_key, true);
+			return '<input 
+						type="text" 
+						name="' . $this->relation_key . '['. $id .']" 
+						class="' . $this->relation_key . '" 
+						value="'. ( isset( $value[ $id ]) ? $value[ $id ] : '' ) .'" />';
+		}
 	}
 
 	/**
@@ -608,6 +640,22 @@ class WDS_CMB2_Attached_Posts_Field {
 		if ( $field && ( $cb = $field->maybe_callback( 'attached_posts_search_query_cb' ) ) ) {
 			call_user_func( $cb, $query, $field, $this );
 		}
+	}
+
+	public function attached_posts_relation_meta( $field_id, $updated, $action, $field ) {
+		if ( $field->args['type'] != 'custom_attached_posts' && !isset( $field->args['options']['show_relation'] ) ) {
+			return;
+		}
+		if ( !$field->args['options']['show_relation'] ) {
+			return;
+		}
+		$this->relation_key = $field->args['id'] . $this->meta_key_suffix;
+	    $labels = $field->data_to_save[ $this->relation_key ];
+		if ( !empty($labels) ) {
+	    	update_post_meta( $field->object_id, $this->relation_key, $labels );
+	    }else{
+	    	delete_post_meta( $field->object_id, $this->relation_key );
+	    }
 	}
 
 }
