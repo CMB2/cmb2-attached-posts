@@ -47,6 +47,7 @@ class WDS_CMB2_Attached_Posts_Field {
 	 */
 	protected function __construct() {
 		add_action( 'cmb2_render_custom_attached_posts', array( $this, 'render' ), 10, 5 );
+		add_action( 'cmb2_pre_field_display_custom_attached_posts', array( $this, 'display_render' ), 20, 5 );
 		add_action( 'cmb2_sanitize_custom_attached_posts', array( $this, 'sanitize' ), 10, 2 );
 		add_action( 'cmb2_attached_posts_field_add_find_posts_div', array( $this, 'add_find_posts_div' ) );
 		add_action( 'cmb2_after_init', array( $this, 'ajax_find_posts' ) );
@@ -610,5 +611,94 @@ class WDS_CMB2_Attached_Posts_Field {
 		}
 	}
 
+	/**
+	 * Outputs the display of our custom field.
+	 *
+	 * @since 1.2.7
+	 *
+	 * @param bool|mixed         $pre_output Default null value.
+	 * @param CMB2_Field         $field      This field object.
+	 * @param CMB2_Field_Display $display    The `CMB2_Field_Display` object.
+	 */
+	public function display_render( $pre_output, $field, $display ) {
+		if ( ! empty( $pre_output ) ) {
+			return $pre_output;
+		}
+
+		$return = '';
+
+		// If repeatable
+		if ( $display->field->args( 'repeatable' ) ) {
+			$rows = array();
+
+			// And has a repeatable value
+			if ( is_array( $display->field->value ) ) {
+
+				// Then loop and output.
+				foreach ( $display->field->value as $val ) {
+					$rows[] = $this->_display_render( $display->field, $val );
+				}
+			}
+
+			if ( ! empty( $rows ) ) {
+
+				$return .= '<ul class="cmb2-' . str_replace( '_', '-', $display->field->type() ) . '"><li>';
+				foreach ( (array) $rows as $row ) {
+					$return .= sprintf( '<li>%s</a>', $row );
+				}
+				$return .= '</ul>';
+
+			} else {
+				$return .= '&mdash;';
+			}
+
+		} else {
+			$return .= $this->_display_render( $display->field, $display->field->value );
+		}
+
+		return $return ? $return : $pre_output;
+	}
+
+	/**
+	 * Outputs the display of our custom field per repeatable value, if applicable.
+	 *
+	 * @since 1.2.7
+	 *
+	 * @param CMB2_Field $field This field object.
+	 * @param mixed      $val   The field value.
+	 */
+	public function _display_render( $field, $val ) {
+		$return = '';
+		$posts = array();
+
+		if ( ! empty( $val ) ) {
+			foreach ( (array) $val as $id ) {
+				$title = get_the_title( $id );
+				if ( $title ) {
+					$edit_link = get_edit_post_link( $id );
+					$posts[ $id ] = compact( 'title', 'edit_link' );
+				}
+			}
+		}
+
+		if ( ! empty( $posts ) ) {
+
+			$return .= '<ol>';
+			foreach ( (array) $posts as $id => $post ) {
+				$return .= sprintf(
+					'<li id="attached-%d"><a href="%s">%s</a></li>',
+					$id,
+					$post['edit_link'],
+					$post['title']
+				);
+			}
+			$return .= '</ol>';
+
+		} else {
+			$return .= '&mdash;';
+		}
+
+		return $return;
+	}
 }
 WDS_CMB2_Attached_Posts_Field::get_instance();

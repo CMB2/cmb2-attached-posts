@@ -40,6 +40,9 @@ Once you have the post data for the post ID, you can proceed with the desired fu
 
 ## Changelog
 
+### 1.2.7
+* Add default column display output. Simply add `'column' => true,` to your field registration.
+
 ### 1.2.6
 * Add post type label next to post title when multiple post-types are specified in the query args.
 
