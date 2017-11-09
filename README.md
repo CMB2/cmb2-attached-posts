@@ -45,6 +45,7 @@ Once you have the post data for the post ID, you can proceed with the desired fu
 
 ### 1.2.6
 * Add post type label next to post title when multiple post-types are specified in the query args.
+* Open attached-posts links in new window, so as not to leave the current editing window. Props [Shelob9](https://github.com/Shelob9), [#37](https://github.com/WebDevStudios/cmb2-attached-posts/pull/37)), [#36](https://github.com/CMB2/cmb2-attached-posts/issues/36)).
 
 ### 1.2.5
 * Combined the best bits from the [CMB2 Post Search field](https://github.com/WebDevStudios/CMB2-Post-Search-field) type and this field type, so now you can search for additional posts/pages/etc to be attached. User search is not currently supported. ([#7](https://github.com/WebDevStudios/cmb2-attached-posts/pull/7)).
