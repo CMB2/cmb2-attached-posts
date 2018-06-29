@@ -113,7 +113,7 @@ class WDS_CMB2_Attached_Posts_Field {
 		} else {
 			// Setup our args
 			$args = wp_parse_args( $query_args, array(
-				'number' => 100,
+				'number' => -1,
 			) );
 			$post_type_labels = $field_type->_text( 'users_text', esc_html__( 'Users' ) );
 		}
