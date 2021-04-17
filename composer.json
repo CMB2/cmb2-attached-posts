@@ -2,6 +2,8 @@
     "name": "cmb2/cmb2-attached-posts",
     "description": "Custom field for CMB2 for creating post relationships.",
     "license": "GPL-2.0+",
+    "prefer-stable": true,
+    "minimum-stability": "dev",
     "authors": [
         {
             "name": "Justin Sternberg",
