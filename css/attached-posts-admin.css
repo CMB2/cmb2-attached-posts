@@ -39,7 +39,8 @@
 }
 
 .cmb-type-custom-attached-posts .has-thumbnails.connected {
-	height: 30em;
+	height: 150px;
+	overflow: scroll;
 }
 
 .cmb-type-custom-attached-posts .has-thumbnails li {
