@@ -365,7 +365,7 @@ class WDS_CMB2_Attached_Posts_Field {
 		$post_type_obj = get_post_type_object( $object->post_type );
 		$label = isset( $post_type_obj->labels->singular_name ) ? $post_type_obj->labels->singular_name : $post_type_obj->label;
 
-		return apply_filters( 'cmb2_attached_posts_field_label', ' &mdash; <span class="object-label">' . $label . '</span> ', $object );
+		return apply_filters( 'cmb2_attached_posts_field_label', ' &mdash; <span class="object-label">' . $label . '</span> ', $label, $object );
 	}
 
 	/**
