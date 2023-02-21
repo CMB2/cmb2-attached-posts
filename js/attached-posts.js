@@ -12,6 +12,8 @@ window.CMBAP = window.CMBAP || {};
 		app.$.retrievedPosts = $wrap.find( '.retrieved' );
 		app.$.attachedPosts  = $wrap.find( '.attached' );
 		app.doType           = $wrap.find( '.object-label' ).length;
+		// Check for multiple attached-post meta boxes
+		app.$.attachedBoxes	 = $wrap.length; 
 	};
 
 	app.init = function() {
@@ -376,6 +378,7 @@ window.CMBAP = window.CMBAP || {};
 	};
 
 	app._openSearch = function( evt ) {
+		app.updateRetrievedPosts( $(this) );
 		app.openSearch( $( evt.currentTarget ) );
 	};
 
@@ -387,6 +390,14 @@ window.CMBAP = window.CMBAP || {};
 
 		app.search.trigger( 'open' );
 	};
+
+	app.updateRetrievedPosts = function( $this ){
+		// If more than one custom_attached_posts update cache with current metabox context
+		if ( app.$.attachedBoxes > 1 ) {
+			var $wrap            = $this.closest(' .attached-posts-wrap' );
+			app.$.retrievedPosts = $wrap.find( '.retrieved' );	
+		}
+	}
 
 	$( app.init );
 
