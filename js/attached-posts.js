@@ -14,6 +14,46 @@ window.CMBAP = window.CMBAP || {};
 		app.doType           = $wrap.find( '.object-label' ).length;
 	};
 
+	// Helper function to determine whteher we have exceeded our limit or not.
+	app._hasExceeded = function ($wrap) {
+		var $input = app.getPostIdsInput($wrap);
+		var maxItems = $input.data('max-items');
+		var currentNumberItems = app.getPostIdsVal($input).length;
+
+		return (typeof maxItems !== "undefined") && currentNumberItems >= maxItems;
+	};
+
+	// Make sure we cannot attach more posts than we would like.
+	app.updateReadOnly = function ($wrap) {
+
+		// If we have exceeded our limit, then ensure the user cannot attach more items.
+		// If we haven't, make sure the user can attach items.
+		if (app._hasExceeded($wrap)) {
+			// Also ensure items aren't draggable
+			// @see https://stackoverflow.com/questions/1324044/how-do-i-disable-a-jquery-ui-draggable
+			// app.$retrievedPosts().draggable('disable');
+			$wrap.find('.attached').droppable("option", "accept", ".doesnotexist");
+		} else {
+			// app.$retrievedPosts().draggable('enable');
+			$wrap.find('.attached').droppable("option", "accept", ".retrieved li");
+		}
+	};
+
+	app.updateRemaining = function ($wrap) {
+		var $input = app.getPostIdsInput($wrap);
+		var currentNumberItems = app.getPostIdsVal($input).length;
+		var maxItems = $input.data('max-items');
+		var $remainingLabel = $wrap.find('.attached-posts-remaining');
+		var $remainingNumberLabel = $remainingLabel.find('.attached-posts-remaining-number');
+		var remainingNumber = 0;
+		if (typeof maxItems !== "undefined") {
+			// How many can we add?
+			remainingNumber = maxItems - currentNumberItems;
+			// Show the label and update the number inside
+			$remainingLabel.removeClass("hidden");
+			$remainingNumberLabel.html(remainingNumber);
+		}
+	};
 	app.init = function() {
 		app.cache();
 
@@ -22,6 +62,14 @@ window.CMBAP = window.CMBAP || {};
 
 		// Allow the right list to be droppable and sortable
 		app.makeDroppable();
+
+
+		$(".attached-posts-wrap").each(function () {
+			// Update whether or not the lists should be editable by the user. This is usually when a user has attached too many items.
+			app.updateReadOnly($(this));
+
+			app.updateRemaining($(this))
+		});
 
 		$( '.cmb2-wrap > .cmb2-metabox' )
 			// Add posts when the plus icon is clicked
@@ -75,6 +123,8 @@ window.CMBAP = window.CMBAP || {};
 		item.clone().appendTo( $wrap.find( '.attached' ) );
 
 		app.resetAttachedListItems( $wrap );
+		app.updateRemaining($wrap);
+
 	};
 
 	// Add the items when the plus icon is clicked
@@ -86,6 +136,10 @@ window.CMBAP = window.CMBAP || {};
 	app.moveRowToAttached = function( $li ) {
 		var itemID = $li.data( 'id' );
 		var $wrap  = $li.parents( '.attached-posts-wrap' );
+
+		if (app._hasExceeded($wrap)) {
+			return;
+		}
 
 		if ( $li.hasClass( 'added' ) ) {
 			return;
@@ -103,6 +157,8 @@ window.CMBAP = window.CMBAP || {};
 		$wrap.find( '.attached' ).append( $li.clone() );
 
 		app.resetAttachedListItems( $wrap );
+		app.updateReadOnly($wrap);
+		app.updateRemaining($wrap);
 	};
 
 	// Remove items from our attached list when the minus icon is clicked
@@ -123,6 +179,8 @@ window.CMBAP = window.CMBAP || {};
 		$wrap.find('.retrieved li[data-id="' + itemID +'"]').removeClass('added');
 
 		app.resetAttachedListItems( $wrap );
+		app.updateReadOnly($wrap);
+		app.updateRemaining($wrap);
 	};
 
 	app.inputHasId = function( $wrap, itemID ) {

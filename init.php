@@ -179,7 +179,7 @@ class WDS_CMB2_Attached_Posts_Field {
 
 		// Open our attached posts list
 		echo '<div class="attached-wrap column-wrap">';
-		echo '<h4 class="attached-posts-section">' . sprintf( __( 'Attached %s', 'cmb' ), $post_type_labels ) . '</h4>';
+		echo '<h4 class="attached-posts-section">' . sprintf( __( 'Attached %s', 'cmb' ), $post_type_labels ) . '<span class="attached-posts-remaining hidden">(<span class="attached-posts-remaining-number"></span> remaining)</span></span></h4>';
 
 		if ( $filter_boxes ) {
 			printf( $filter_boxes, 'attached-search' );
