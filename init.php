@@ -430,7 +430,8 @@ class WDS_CMB2_Attached_Posts_Field {
 			}
 		}
 
-		return $attached_objects;
+		return apply_filters( 'cmb2_attached_posts_objects', $attached_objects, $args );
+
 	}
 
 	/**
