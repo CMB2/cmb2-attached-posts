@@ -330,7 +330,7 @@ class WDS_CMB2_Attached_Posts_Field {
 	 * @return int            The object ID.
 	 */
 	public function get_id( $object ) {
-		return $object->ID;
+        return isset($object->ID) ? $object->ID : false;
 	}
 
 	/**
