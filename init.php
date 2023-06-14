@@ -131,6 +131,7 @@ class WDS_CMB2_Attached_Posts_Field {
 
 		// If there are no posts found, just stop
 		if ( empty( $objects ) ) {
+			echo apply_filters( 'cmb2_attached_posts_field_no_items_found', sprintf( '<p><em>%s</em></p>', __( 'No items found.' ) ) );
 			return;
 		}
 
