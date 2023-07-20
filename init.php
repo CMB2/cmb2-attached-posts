@@ -83,7 +83,7 @@ class WDS_CMB2_Attached_Posts_Field {
 				$query_args,
 				array(
 					'post_type'      => 'post',
-					'posts_per_page' => 100,
+					'posts_per_page' => apply_filters( 'cmb2_attached_posts_per_page_filter', 50 ),
 					'post_status'    => apply_filters( 'cmb2_attached_posts_status_filter', $post_status ),
 				)
 			);

@@ -43,7 +43,7 @@
  * Loader versioning: http://jtsternberg.github.io/wp-lib-loader/
  */
 
-if ( ! class_exists( 'WDS_CMB2_Attached_Posts_Field_127', false ) ) {
+if ( ! class_exists( 'WDS_CMB2_Attached_Posts_Field_210', false ) ) {
 
 	/**
 	 * Versioned loader class-name
@@ -54,11 +54,11 @@ if ( ! class_exists( 'WDS_CMB2_Attached_Posts_Field_127', false ) ) {
 	 * @package  WDS_CMB2_Attached_Posts_Field
 	 * @author   WebDevStudios <contact@webdevstudios.com>
 	 * @license  GPL-2.0+
-	 * @version  1.2.7
+	 * @version  2.1.0
 	 * @link     https://github.com/WebDevStudios/cmb2-attached-posts
 	 * @since    1.2.3
 	 */
-	class WDS_CMB2_Attached_Posts_Field_127 {
+	class WDS_CMB2_Attached_Posts_Field_210 {
 
 		/**
 		 * WDS_CMB2_Attached_Posts_Field version number
@@ -152,5 +152,5 @@ if ( ! class_exists( 'WDS_CMB2_Attached_Posts_Field_127', false ) ) {
 	}
 
 	// Kick it off.
-	new WDS_CMB2_Attached_Posts_Field_127();
+	new WDS_CMB2_Attached_Posts_Field_210();
 }
