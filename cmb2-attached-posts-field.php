@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: FORKED -- CMB2 Field Type: Attached Posts
+ * Plugin Name: CMB2 Field Type: Attached Posts
  * Plugin URI: https://github.com/WebDevStudios/cmb2-attached-posts
  * Description: Attached posts field type for CMB2.
  * Version: 2.1

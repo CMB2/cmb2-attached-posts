@@ -74,6 +74,7 @@ class WDS_CMB2_Attached_Posts_Field {
 
 		$query_args  = (array) $this->field->options( 'query_args' );
 		$query_users = $this->field->options( 'query_users' );
+		$post_status = array( 'publish' );
 
 		if ( ! $query_users ) {
 
@@ -83,7 +84,7 @@ class WDS_CMB2_Attached_Posts_Field {
 				array(
 					'post_type'      => 'post',
 					'posts_per_page' => 100,
-					'post_status'    => array( 'publish', 'pending', 'draft', 'future', 'private', 'inherit' ),
+					'post_status'    => apply_filters( 'cmb2_attached_posts_status_filter', $post_status ),
 				)
 			);
 
@@ -378,7 +379,7 @@ class WDS_CMB2_Attached_Posts_Field {
 		$post = get_post( $object );
 		// Initial Title
 		$title = $this->field->options( 'query_users' ) ? $object->data->display_name : get_the_title( $post->ID );
-		$title = apply_filters( 'cmb2_attached_posts_filter_title', $post->ID, $title );
+		$title = apply_filters( 'cmb2_attached_posts_title_filter', $post->ID, $title );
 
 		return $title . $additional;
 	}
@@ -731,7 +732,7 @@ class WDS_CMB2_Attached_Posts_Field {
 			$return .= '<ol>';
 			foreach ( (array) $posts as $id => $post ) {
 
-				$title = apply_filters( 'cmb2_attached_posts_filter_title', $id, $post['title'] );
+				$title = apply_filters( 'cmb2_attached_posts_title_filter', $id, $post['title'] );
 
 				$return .= sprintf(
 					'<li id="attached-%d"><a href="%s">%s</a></li>',
