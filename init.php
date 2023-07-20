@@ -321,14 +321,17 @@ class WDS_CMB2_Attached_Posts_Field {
 	 * @return void
 	 */
 	public function list_item( $object, $li_class, $icon_class = 'dashicons-plus' ) {
-		echo '<li 
-			data-id="' . esc_attr( $this->get_id( $object ) ) . '" 
-			class="' . esc_attr( $li_class ) . '" target="_blank">'
-			. esc_html( $this->get_thumb( $object ) ) . '
-			<a title="Edit" href="' . esc_url( $this->get_edit_link( $object ) ) . '">'
-			. esc_html( $this->get_title( $object ) ) . '</a>
-			' . esc_html( $this->get_object_label( $object ) ) . '<span class="dashicons '
-			. esc_attr( $icon_class ) . ' add-remove"></span></li>';
+		// Build our list item
+		printf(
+			'<li data-id="%1$d" class="%2$s" target="_blank">%3$s<a title="' . esc_html( __( 'Edit' ) ) . '" href="%4$s">%5$s</a>%6$s<span class="dashicons %7$s add-remove"></span></li>',
+			esc_attr( $this->get_id( $object ) ),
+			esc_attr( $li_class ),
+			esc_html( $this->get_thumb( $object ) ),
+			esc_url( $this->get_edit_link( $object ) ),
+			esc_html( $this->get_title( $object ) ),
+			esc_html( $this->get_object_label( $object ) ),
+			esc_attr( $icon_class )
+		);
 	}
 
 	/**
