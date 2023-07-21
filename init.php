@@ -382,7 +382,7 @@ class WDS_CMB2_Attached_Posts_Field {
 		$post = get_post( $object );
 		// Initial Title
 		$title = $this->field->options( 'query_users' ) ? $object->data->display_name : get_the_title( $post->ID );
-		$title = apply_filters( 'cmb2_attached_posts_title_filter', $post->ID, $title );
+		$title = apply_filters( 'cmb2_attached_posts_title_filter', $title, $post->ID );
 
 		return $title;
 	}
@@ -735,7 +735,7 @@ class WDS_CMB2_Attached_Posts_Field {
 			$return .= '<ol>';
 			foreach ( (array) $posts as $id => $post ) {
 
-				$title = apply_filters( 'cmb2_attached_posts_title_filter', $id, $post['title'] );
+				$title = apply_filters( 'cmb2_attached_posts_title_filter', $post['title'], $id );
 
 				$return .= sprintf(
 					'<li id="attached-%d"><a href="%s">%s</a></li>',
